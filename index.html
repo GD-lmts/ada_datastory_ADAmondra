@@ -22,8 +22,13 @@
         .chat-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
 
-        /* Typing cursor animation */
+        /* Typing cursor animation for input */
         .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+        }
+        /* Typing cursor animation for message bubbles */
+        .ai-typing-message::after {
             content: '|';
             animation: blink 1s step-start infinite;
         }
@@ -39,24 +44,27 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Sidebar active state */
-        .sidebar-item.active {
-            background-color: #e0e7ff;
-            color: #4338ca;
-            border-left: 4px solid #4338ca;
+        /* Sidebar starting state */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.7s ease-out;
+        }
+        /* Sidebar slide-in state */
+        #sidebar.is-active {
+            transform: translateX(0);
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
 
     <!-- SIDEBAR (Navigation) -->
-    <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-sm z-20">
-        <div class="p-6 border-b border-slate-100">
-            <h1 class="font-bold text-xl text-slate-800 flex items-center gap-2">
+    <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20">
+        <div class="p-6 border-b border-slate-100 h-40">
+            <h1 id="sidebar-title" class="font-bold text-xl text-slate-800 flex items-center gap-2">
                 <i class="fa-solid fa-network-wired text-blue-600"></i>
-                Wikispeedia
+                <span id="title-text-target"></span>
             </h1>
-            <p class="text-xs text-slate-500 mt-1">Data Analysis Project</p>
+            <p id="sidebar-subtitle" class="text-xs text-slate-500 mt-1 opacity-0 transition-opacity duration-700"></p>
         </div>
         
         <div class="p-4 flex-1 overflow-y-auto">
@@ -82,14 +90,14 @@
 
         <!-- CHAT AREA -->
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 chat-scroll scroll-smooth">
-            <!-- Initial Greeting -->
+            <!-- Initial Greeting: This message is handled separately to kick off the chat flow -->
             <div class="flex w-full justify-start fade-in-up" id="msg-0">
                 <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
                         <i class="fa-solid fa-robot text-sm"></i>
                     </div>
                     <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
-                        <p>Hello! I've been analyzing the <strong>Wikispeedia</strong> dataset. I'm trying to understand how humans navigate knowledge differently than machines.</p>
+                        <p>Welcome to the analysis. Let's see if we can find the "Most Human" path in Wikispeedia. Click Send to begin the conversation.</p>
                     </div>
                 </div>
             </div>
@@ -121,112 +129,153 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- CONFIGURATION: EDIT YOUR SCRIPT HERE ---
-        const conversationScript = [
+        const conversationTopics = [
             {
-                title: "Intro",
-                human: "So, what is this project about?",
-                ai: "I've been analyzing 'Wikispeedia'. It's a game where players travel from one Wikipedia article to another using only hyperlinks. I'm trying to figure out if there's a specific 'human' strategy.",
-                visual: "none"
+                title: "Project Overview",
+                steps: [
+                    {
+                        human: "So, what is this project about?",
+                        ai: "The goal is to analyze player paths in the Wikispeedia game (Wikipedia hyperlinking) to find patterns that distinguish human navigation from computational algorithms like Breadth-First Search (BFS).",
+                        visual: "none"
+                    },
+                    {
+                        human: "What makes human paths unique?",
+                        ai: "Humans prioritize semantic relatedness over raw shortest distance, often using highly connected 'Hubs' (like 'United States' or 'History') even if it adds one click to the path.",
+                        visual: "none"
+                    }
+                ]
             },
             {
-                title: "Data Visualization",
-                human: "Interesting. What does the data look like?",
-                ai: "Humans rarely take the shortest mathematical route. Instead, they navigate via semantic associations. Here is a comparison of path lengths:",
-                visual: "bar-chart"
-            },
-            {
-                title: "Strategy Analysis",
-                human: "What do you mean by 'semantic associations'?",
-                ai: "Humans use 'Hubs'. Instead of going direct, they go to broad concepts first. For example, if going from 'Apple' to 'Zinc', they might route through 'Science'.",
-                visual: "network-graph"
-            },
-            {
-                title: "Efficiency Check",
-                human: "So, algorithms are more efficient?",
-                ai: "Technically, yes. Dijkstra's algorithm finds shorter paths. But humans are faster *conceptually*. We analyzed the click-through rates, and humans succeed more often when they use high-degree hub nodes.",
-                visual: "heatmap"
+                title: "Path Efficiency",
+                steps: [
+                    {
+                        human: "How long are the paths compared to AI?",
+                        ai: "As this bar chart shows, humans take a statistically longer path. Our mean path length is 5.5 clicks, while a simple BFS averages 4.2. Humans trade efficiency for familiarity.",
+                        visual: "bar-chart"
+                    },
+                    {
+                        human: "Can you prove humans use Hubs intentionally?",
+                        ai: "We mapped the degree of every node clicked. Human paths are far more likely to include pages with a high number of outgoing links, confirming the 'Hub' strategy is consistent.",
+                        visual: "network-graph"
+                    }
+                ]
             },
             {
                 title: "Conclusion",
-                human: "What is the conclusion then?",
-                ai: "The 'Most Human Strategy' isn't about speed—it's about familiarity. The optimal strategy for a human player is to seek the nearest general category immediately.",
-                visual: "none"
+                steps: [
+                    {
+                        human: "What is the final conclusion for the 'Most Human Strategy'?",
+                        ai: "The 'Most Human Strategy' is a hybrid: quickly jump to a familiar, high-degree hub, and then search locally. It's a method optimized for speed of decision, not path distance. We conclude familiarity trumps efficiency for the human mind.",
+                        visual: "heatmap"
+                    }
+                ]
             }
         ];
 
-        // --- STATE VARIABLES ---
-        let currentStep = 0;
+        // --- GLOBAL CONSTANTS & STATE ---
+        const NEW_TITLE = "Does the Way Words Relate Mirror the Paths of Human Thought?";
+        const SUBTITLE = "Applied Data Analysis project \n Team ADAm ondra \n David Brantschen \n Nathan Mutin \n Valentin Planes \n Julie Terreaux \n Guillaume Delamare";
+
+        let currentTopicIndex = 0;
+        let currentStepIndex = 0;
         let isTyping = false;
         let isAiThinking = false;
+        let totalHumanMessages = 0; // Used for sidebar ID tracking
 
         // --- DOM ELEMENTS ---
+        const sidebar = document.getElementById('sidebar');
         const chatContainer = document.getElementById('chat-container');
         const messagesEnd = document.getElementById('messages-end');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const tooltip = document.getElementById('click-tooltip');
         const sidebarNav = document.getElementById('sidebar-nav');
+        const sidebarTitle = document.getElementById('sidebar-title');
+        const sidebarSubtitle = document.getElementById('sidebar-subtitle');
+
+        // --- UTILITY FUNCTIONS ---
+
+        function scrollToBottom() {
+            messagesEnd.scrollIntoView({ behavior: "smooth" });
+        }
+
+        // Simulates typing effect for a given element
+        function typeText(element, text, speed = 30) {
+            return new Promise(resolve => {
+                let charIndex = 0;
+                element.classList.add('ai-typing-message');
+                const interval = setInterval(() => {
+                    if (charIndex < text.length) {
+                        element.innerHTML += text.charAt(charIndex);
+                        charIndex++;
+                        scrollToBottom();
+                    } else {
+                        clearInterval(interval);
+                        element.classList.remove('ai-typing-message');
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
 
         // --- VISUALIZATION TEMPLATES (Mock Data) ---
         function getVisualHTML(type) {
             if (type === 'bar-chart') {
                 return `
                 <div class="mt-3 bg-slate-100 p-4 rounded-lg border border-slate-200">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Average Path Length</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Average Path Length Comparison</p>
                     <div class="flex items-end h-32 space-x-4">
                         <div class="w-12 bg-blue-500 rounded-t h-24 flex items-center justify-center text-white text-[10px]">Human</div>
-                        <div class="w-12 bg-emerald-500 rounded-t h-12 flex items-center justify-center text-white text-[10px]">AI</div>
-                        <div class="w-12 bg-purple-500 rounded-t h-20 flex items-center justify-center text-white text-[10px]">Rand</div>
+                        <div class="w-12 bg-emerald-500 rounded-t h-12 flex items-center justify-center text-white text-[10px]">AI (BFS)</div>
+                        <div class="w-12 bg-purple-500 rounded-t h-20 flex items-center justify-center text-white text-[10px]">Random</div>
                     </div>
                 </div>`;
             }
             if (type === 'network-graph') {
                 return `
                 <div class="mt-3 bg-slate-900 p-4 rounded-lg border border-slate-700 flex flex-col items-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-4 w-full">Hub Node Analysis</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-4 w-full">Hub Node Usage Frequency</p>
                     <div class="relative w-32 h-32">
                         <div class="absolute inset-0 m-auto w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
                         <div class="absolute top-0 left-0 w-2 h-2 bg-slate-500 rounded-full"></div>
                         <div class="absolute bottom-2 right-4 w-2 h-2 bg-slate-500 rounded-full"></div>
                         <svg class="absolute inset-0 w-full h-full"><line x1="50%" y1="50%" x2="10%" y2="10%" stroke="gray" /><line x1="50%" y1="50%" x2="80%" y2="90%" stroke="gray" /></svg>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Central nodes act as gravity wells.</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Central nodes (Hubs) appear in 70% of human paths.</p>
                 </div>`;
             }
             if (type === 'heatmap') {
                 return `
                 <div class="mt-3 bg-white p-3 rounded-lg border border-slate-200">
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Success Rate by Strategy</p>
                     <div class="space-y-2">
-                        <div><div class="flex justify-between text-xs"><span>Broad Search</span><span class="font-bold">88%</span></div><div class="w-full bg-slate-100 h-2 rounded"><div class="bg-blue-600 h-2 rounded" style="width:88%"></div></div></div>
-                        <div><div class="flex justify-between text-xs"><span>Exact Search</span><span class="font-bold">45%</span></div><div class="w-full bg-slate-100 h-2 rounded"><div class="bg-red-400 h-2 rounded" style="width:45%"></div></div></div>
+                        <div><div class="flex justify-between text-xs"><span>Hub-First Search</span><span class="font-bold">88%</span></div><div class="w-full bg-slate-100 h-2 rounded"><div class="bg-blue-600 h-2 rounded" style="width:88%"></div></div></div>
+                        <div><div class="flex justify-between text-xs"><span>Strict Shortest Path</span><span class="font-bold">45%</span></div><div class="w-full bg-slate-100 h-2 rounded"><div class="bg-red-400 h-2 rounded" style="width:45%"></div></div></div>
                     </div>
                 </div>`;
             }
             return '';
         }
 
-        // --- FUNCTIONS ---
+        // --- CORE CHAT FUNCTIONS ---
 
-        function scrollToBottom() {
-            messagesEnd.scrollIntoView({ behavior: "smooth" });
-        }
-
-        function addToSidebar(index, title, humanText) {
-            // Create sidebar link
+        function addToSidebar(topicIndex, title) {
+            // Only add the main topic title to the sidebar once
+            if (document.getElementById(`topic-link-${topicIndex}`)) return;
+            
             const li = document.createElement('div');
             li.innerHTML = `
-                <button onclick="jumpToMessage(${index + 1})" class="sidebar-item w-full text-left px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
-                    <span class="text-[10px] font-bold bg-slate-200 text-slate-500 w-5 h-5 flex items-center justify-center rounded-full">${index + 1}</span>
+                <button id="topic-link-${topicIndex}" onclick="jumpToMessage(${currentStepIndex})" class="sidebar-item w-full text-left px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                    <span class="text-[10px] font-bold bg-slate-200 text-slate-500 w-5 h-5 flex items-center justify-center rounded-full">${topicIndex + 1}</span>
                     <span class="truncate">${title}</span>
                 </button>
             `;
             sidebarNav.appendChild(li);
         }
 
-        // Global function for onclick event
-        window.jumpToMessage = function(stepIndex) {
-            // +1 because msg-0 is the intro
-            const el = document.getElementById(`msg-${stepIndex}`);
+        // Global function for onclick event (jumps to the human message that starts the topic)
+        window.jumpToMessage = function(targetMsgId) {
+            const el = document.getElementById(`msg-${targetMsgId}`);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
@@ -236,12 +285,12 @@
             }
         };
 
-        function addMessage(sender, text, visual, stepIndex) {
+        function addMessage(sender, text, visual, stepMsgId) {
             const wrapper = document.createElement('div');
             wrapper.className = `flex w-full ${sender === 'human' ? 'justify-end' : 'justify-start'} fade-in-up`;
             
             // Assign ID to human messages for sidebar jumping
-            if (sender === 'human') wrapper.id = `msg-${stepIndex}`; 
+            if (sender === 'human') wrapper.id = `msg-${stepMsgId}`; 
             
             const isHuman = sender === 'human';
             
@@ -251,7 +300,7 @@
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
                     <div class="p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
-                        <p>${text}</p>
+                        <p id="msg-text-${totalHumanMessages}" class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
                         ${visual !== 'none' && !isHuman ? getVisualHTML(visual) : ''}
                     </div>
                 </div>
@@ -259,6 +308,8 @@
             
             chatContainer.insertBefore(wrapper, messagesEnd);
             scrollToBottom();
+
+            return wrapper; // Return wrapper to target the message for AI typing
         }
 
         function showTypingIndicator() {
@@ -287,14 +338,14 @@
         }
 
         function prepareNextStep() {
-            if (currentStep >= conversationScript.length) {
+            if (currentTopicIndex >= conversationTopics.length) {
                 // End of conversation
-                userInput.placeholder = "Analysis Complete.";
+                userInput.placeholder = "Analysis Complete. Thank you for viewing.";
                 userInput.value = "";
                 return;
             }
 
-            const stepData = conversationScript[currentStep];
+            const stepData = conversationTopics[currentTopicIndex].steps[currentStepIndex];
             const targetText = stepData.human;
             let charIndex = 0;
 
@@ -319,21 +370,46 @@
                         sendBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'cursor-pointer', 'shadow-md');
                         tooltip.classList.remove('hidden');
                     }
-                }, 30); // Typing speed
+                }, 30); // Human Typing speed
             }, 1000);
+        }
+
+        // --- INITIALIZATION ---
+
+        function animateTitleOnLoad() {
+            // 1. Sidebar Slide In
+            sidebar.classList.add('is-active');
+
+            // 2. Title Typing
+            const titleTarget = document.getElementById('title-text-target');
+            typeText(titleTarget, NEW_TITLE, 70).then(() => {
+                // 3. Subtitle Fade In
+                sidebarSubtitle.innerHTML = SUBTITLE.replace(/\n/g, '<br>');
+                sidebarSubtitle.classList.remove('opacity-0');
+            }).then(() => {
+                // 4. Start the first human prompt
+                prepareNextStep();
+            });
         }
 
         // --- EVENT LISTENERS ---
 
         sendBtn.addEventListener('click', () => {
-            if (isTyping || isAiThinking || currentStep >= conversationScript.length) return;
+            if (isTyping || isAiThinking || currentTopicIndex >= conversationTopics.length) return;
 
-            // 1. Send Human Message
-            const stepData = conversationScript[currentStep];
-            addMessage('human', stepData.human, 'none', currentStep + 1); // +1 because 0 is intro
-            addToSidebar(currentStep, stepData.title, stepData.human);
+            const currentTopic = conversationTopics[currentTopicIndex];
+            const stepData = currentTopic.steps[currentStepIndex];
+            
+            // --- 1. Send Human Message ---
+            totalHumanMessages++;
+            addMessage('human', stepData.human, 'none', totalHumanMessages); 
 
-            // Reset Input
+            // If this is the start of a new topic, add it to the sidebar
+            if (currentStepIndex === 0) {
+                addToSidebar(currentTopicIndex, currentTopic.title);
+            }
+
+            // --- 2. UI Reset/Thinking State ---
             userInput.value = "";
             userInput.placeholder = "AI is thinking...";
             sendBtn.disabled = true;
@@ -341,18 +417,31 @@
             sendBtn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'shadow-md');
             tooltip.classList.add('hidden');
             
-            // 2. AI Thinking
             isAiThinking = true;
             showTypingIndicator();
 
-            setTimeout(() => {
+            // --- 3. AI Response Delay and Typing ---
+            setTimeout(async () => {
                 removeTypingIndicator();
                 
-                // 3. AI Response
-                addMessage('ai', stepData.ai, stepData.visual, null);
+                // Add AI message wrapper (with empty text target)
+                const aiMessageWrapper = addMessage('ai', '', stepData.visual, null);
+                const aiTextTarget = aiMessageWrapper.querySelector('p');
+
+                // Type out the AI text
+                await typeText(aiTextTarget, stepData.ai);
                 
                 isAiThinking = false;
-                currentStep++;
+
+                // --- 4. Advance Step ---
+                currentStepIndex++;
+                
+                // Check if this topic is finished
+                if (currentStepIndex >= currentTopic.steps.length) {
+                    currentTopicIndex++; // Move to next topic
+                    currentStepIndex = 0; // Reset step index
+                }
+                
                 prepareNextStep();
 
             }, 1500); // Thinking delay
@@ -360,8 +449,8 @@
 
         // --- INITIALIZATION ---
         window.onload = () => {
-            // Start the loop
-            prepareNextStep();
+            // Wait for 500ms before starting the animation sequence
+            setTimeout(animateTitleOnLoad, 500);
         };
 
     </script>
