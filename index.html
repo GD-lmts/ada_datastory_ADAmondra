@@ -59,23 +59,29 @@
 
     <!-- SIDEBAR (Navigation) -->
     <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20">
-        <div class="p-6 border-b border-slate-100 h-40">
-            <h1 id="sidebar-title" class="font-bold text-xl text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-network-wired text-blue-600"></i>
+        <!-- Increased height to h-56 to prevent title overlap -->
+        <div class="p-6 border-b border-slate-100 h-75 flex flex-col justify-end">
+            <!-- UPDATED: Removed 'gap-2' and changed 'items-center' to 'items-baseline' for fixed alignment -->
+            <h1 id="sidebar-title" class="font-bold text-xl text-slate-800 flex items-baseline mb-2">
+                <!-- UPDATED: Added 'mr-2' to the icon for fixed spacing -->
+                <i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>
                 <span id="title-text-target"></span>
             </h1>
-            <p id="sidebar-subtitle" class="text-xs text-slate-500 mt-1 opacity-0 transition-opacity duration-700"></p>
+            <p id="sidebar-subtitle-header" class="text-xs text-slate-800 transition-opacity duration-700"></p>
+            <!-- Removed py-2 for cleaner spacing -->
+            <!--<p id="sidebar-subtitle-names" class="text-xs text-slate-500 mt-1 opacity-0 transition-opacity duration-700"></p> -->
         </div>
         
         <div class="p-4 flex-1 overflow-y-auto">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Conversation Topics</h3>
-            <nav id="sidebar-nav" class="space-y-1">
+            <!-- Conversation topics are hidden on load and fade in later -->
+            <nav id="sidebar-nav" class="space-y-1 opacity-0 transition-opacity duration-500">
                 <!-- Sidebar items will be injected here via JS -->
             </nav>
         </div>
 
         <div class="p-4 border-t border-slate-100 text-xs text-slate-400 text-center">
-            Built for GitHub Pages
+            David Brantschen \n Nathan Mutin \n Valentin Planes \n Julie Terreaux \n Guillaume Delamare
         </div>
     </aside>
 
@@ -90,8 +96,8 @@
 
         <!-- CHAT AREA -->
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 chat-scroll scroll-smooth">
-            <!-- Initial Greeting: This message is handled separately to kick off the chat flow -->
-            <div class="flex w-full justify-start fade-in-up" id="msg-0">
+            <!-- Initial Greeting: IMPORTANT: 'hidden' class ensures it is NOT visible until JS removes it -->
+            <div class="flex w-full justify-start fade-in-up opacity-0 hidden" id="msg-0">
                 <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
                         <i class="fa-solid fa-robot text-sm"></i>
@@ -174,7 +180,8 @@
 
         // --- GLOBAL CONSTANTS & STATE ---
         const NEW_TITLE = "Does the Way Words Relate Mirror the Paths of Human Thought?";
-        const SUBTITLE = "Applied Data Analysis project \n Team ADAm ondra \n David Brantschen \n Nathan Mutin \n Valentin Planes \n Julie Terreaux \n Guillaume Delamare";
+        const SUBTITLE_HEADER = "Applied Data Analysis project \n Team ADAm ondra";
+        const SUBTITLE_NAMES = "David Brantschen \n Nathan Mutin \n Valentin Planes \n Julie Terreaux \n Guillaume Delamare";
 
         let currentTopicIndex = 0;
         let currentStepIndex = 0;
@@ -185,13 +192,17 @@
         // --- DOM ELEMENTS ---
         const sidebar = document.getElementById('sidebar');
         const chatContainer = document.getElementById('chat-container');
+        const initialAiMessage = document.getElementById('msg-0'); // New reference for initial AI message
         const messagesEnd = document.getElementById('messages-end');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const tooltip = document.getElementById('click-tooltip');
         const sidebarNav = document.getElementById('sidebar-nav');
         const sidebarTitle = document.getElementById('sidebar-title');
-        const sidebarSubtitle = document.getElementById('sidebar-subtitle');
+        const titleTextTarget = document.getElementById('title-text-target');
+        const sidebarSubtitleHeader = document.getElementById('sidebar-subtitle-header');
+        const sidebarSubtitleNames = document.getElementById('sidebar-subtitle-names');
+
 
         // --- UTILITY FUNCTIONS ---
 
@@ -200,7 +211,8 @@
         }
 
         // Simulates typing effect for a given element
-        function typeText(element, text, speed = 30) {
+        // Speed is 15ms by default (fast for AI/human)
+        function typeText(element, text, speed = 15) { 
             return new Promise(resolve => {
                 let charIndex = 0;
                 element.classList.add('ai-typing-message');
@@ -370,24 +382,37 @@
                         sendBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'cursor-pointer', 'shadow-md');
                         tooltip.classList.remove('hidden');
                     }
-                }, 30); // Human Typing speed
+                }, 15); // Human Typing speed (15ms)
             }, 1000);
         }
 
         // --- INITIALIZATION ---
 
         function animateTitleOnLoad() {
-            // 1. Sidebar Slide In
+            // 1. Sidebar Slide In (0.7s)
             sidebar.classList.add('is-active');
 
-            // 2. Title Typing
-            const titleTarget = document.getElementById('title-text-target');
-            typeText(titleTarget, NEW_TITLE, 70).then(() => {
-                // 3. Subtitle Fade In
-                sidebarSubtitle.innerHTML = SUBTITLE.replace(/\n/g, '<br>');
-                sidebarSubtitle.classList.remove('opacity-0');
+            // 2. Title Typing (40ms/char)
+            typeText(titleTextTarget, NEW_TITLE, 40).then(() => {
+                // 3. Subtitle Fade In (Starts 700ms transition)
+                sidebarSubtitleHeader.innerHTML = SUBTITLE_HEADER.replace(/\n/g, '<br>');
+                sidebarSubtitleNames.innerHTML = SUBTITLE_NAMES.replace(/\n/g, '<br>');
+                sidebarSubtitleNames.classList.remove('opacity-0');
+                
+                // Wait for Subtitle fade to finish (700ms) + buffer (200ms)
+                return new Promise(resolve => setTimeout(resolve, 900));
             }).then(() => {
-                // 4. Start the first human prompt
+                // 4. Fade in conversation topics (sidebar nav)
+                sidebarNav.classList.remove('opacity-0');
+                
+                // 5. Wait for conversation topics fade to finish (500ms) + extra buffer (500ms) = 1000ms
+                return new Promise(resolve => setTimeout(resolve, 1000));
+            }).then(() => {
+                // 6. Reveal and fade in initial AI message
+                // By removing 'hidden', the element is added to the flow and the 'fade-in-up' animation is triggered.
+                initialAiMessage.classList.remove('hidden');
+                
+                // 7. Start the first human prompt
                 prepareNextStep();
             });
         }
@@ -402,11 +427,14 @@
             
             // --- 1. Send Human Message ---
             totalHumanMessages++;
-            addMessage('human', stepData.human, 'none', totalHumanMessages); 
+            // We use totalHumanMessages as the message ID for linking back from the sidebar
+            const humanMsgId = totalHumanMessages; 
+            addMessage('human', stepData.human, 'none', humanMsgId); 
 
             // If this is the start of a new topic, add it to the sidebar
             if (currentStepIndex === 0) {
-                addToSidebar(currentTopicIndex, currentTopic.title);
+                // Pass the ID of the current human message, which is the start of the topic
+                addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
             }
 
             // --- 2. UI Reset/Thinking State ---
