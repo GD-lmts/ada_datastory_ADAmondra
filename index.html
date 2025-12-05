@@ -59,19 +59,18 @@
 
     <!-- SIDEBAR (Navigation) -->
     <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20">
-        <!-- Increased height to h-56 to prevent title overlap -->
-        <div class="p-6 border-b border-slate-100 h-75 flex flex-col justify-end">
-            <!-- UPDATED: Removed 'gap-2' and changed 'items-center' to 'items-baseline' for fixed alignment -->
+        <!-- HEADER SECTION -->
+        <div class="p-6 border-b border-slate-100 h-56 flex flex-col justify-end">
+            <!-- Title with fixed icon alignment -->
             <h1 id="sidebar-title" class="font-bold text-xl text-slate-800 flex items-baseline mb-2">
-                <!-- UPDATED: Added 'mr-2' to the icon for fixed spacing -->
                 <i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>
                 <span id="title-text-target"></span>
             </h1>
+            <!-- Subtitle Header (e.g., Project Name) -->
             <p id="sidebar-subtitle-header" class="text-xs text-slate-800 transition-opacity duration-700"></p>
-            <!-- Removed py-2 for cleaner spacing -->
-            <!--<p id="sidebar-subtitle-names" class="text-xs text-slate-500 mt-1 opacity-0 transition-opacity duration-700"></p> -->
         </div>
         
+        <!-- NAVIGATION SECTION -->
         <div class="p-4 flex-1 overflow-y-auto">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Conversation Topics</h3>
             <!-- Conversation topics are hidden on load and fade in later -->
@@ -80,8 +79,13 @@
             </nav>
         </div>
 
-        <div class="p-4 border-t border-slate-100 text-xs text-slate-400 text-center">
-            David Brantschen \n Nathan Mutin \n Valentin Planes \n Julie Terreaux \n Guillaume Delamare
+        <!-- FOOTER SECTION (Now holds team names) -->
+        <div class="p-4 border-t border-slate-100">
+            <!-- Repurposed ID to hold the team members' names -->
+            <!-- MODIFIED: Smaller text and added initial animation classes (opacity-0, translate-y-4) -->
+            <p id="sidebar-subtitle-names" 
+               class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out">
+            </p>
         </div>
     </aside>
 
@@ -181,7 +185,8 @@
         // --- GLOBAL CONSTANTS & STATE ---
         const NEW_TITLE = "Does the Way Words Relate Mirror the Paths of Human Thought?";
         const SUBTITLE_HEADER = "Applied Data Analysis project \n Team ADAm ondra";
-        const SUBTITLE_NAMES = "David Brantschen \n Nathan Mutin \n Valentin Planes \n Julie Terreaux \n Guillaume Delamare";
+        // MODIFIED: Formatting the names for tighter display (multiple per line)
+        const SUBTITLE_NAMES = "David Brantschen, Nathan Mutin \n Valentin Planes, Julie Terreaux \n Guillaume Delamare";
 
         let currentTopicIndex = 0;
         let currentStepIndex = 0;
@@ -201,6 +206,7 @@
         const sidebarTitle = document.getElementById('sidebar-title');
         const titleTextTarget = document.getElementById('title-text-target');
         const sidebarSubtitleHeader = document.getElementById('sidebar-subtitle-header');
+        // sidebarSubtitleNames is now in the footer
         const sidebarSubtitleNames = document.getElementById('sidebar-subtitle-names');
 
 
@@ -394,13 +400,16 @@
 
             // 2. Title Typing (40ms/char)
             typeText(titleTextTarget, NEW_TITLE, 40).then(() => {
-                // 3. Subtitle Fade In (Starts 700ms transition)
-                sidebarSubtitleHeader.innerHTML = SUBTITLE_HEADER.replace(/\n/g, '<br>');
-                sidebarSubtitleNames.innerHTML = SUBTITLE_NAMES.replace(/\n/g, '<br>');
-                sidebarSubtitleNames.classList.remove('opacity-0');
                 
-                // Wait for Subtitle fade to finish (700ms) + buffer (200ms)
-                return new Promise(resolve => setTimeout(resolve, 900));
+                // 3. Populate subtitles (header and new footer location)
+                sidebarSubtitleHeader.innerHTML = SUBTITLE_HEADER.replace(/\n/g, '<br>');
+                sidebarSubtitleNames.innerHTML = SUBTITLE_NAMES.replace(/\n/g, '<br>'); // Now populating the footer element
+                
+                // POP UP ANIMATION: Trigger pop-up animation for team names
+                sidebarSubtitleNames.classList.remove('opacity-0', 'translate-y-4');
+
+                // Wait for Sidebar slide-in to feel complete (500ms)
+                return new Promise(resolve => setTimeout(resolve, 500));
             }).then(() => {
                 // 4. Fade in conversation topics (sidebar nav)
                 sidebarNav.classList.remove('opacity-0');
@@ -409,7 +418,6 @@
                 return new Promise(resolve => setTimeout(resolve, 1000));
             }).then(() => {
                 // 6. Reveal and fade in initial AI message
-                // By removing 'hidden', the element is added to the flow and the 'fade-in-up' animation is triggered.
                 initialAiMessage.classList.remove('hidden');
                 
                 // 7. Start the first human prompt
