@@ -82,7 +82,7 @@
         <!-- FOOTER SECTION (Now holds team names) -->
         <div class="p-4 border-t border-slate-100">
             <!-- Repurposed ID to hold the team members' names -->
-            <!-- MODIFIED: Smaller text and added initial animation classes (opacity-0, translate-y-4) -->
+            <!-- Smaller text and added initial animation classes (opacity-0, translate-y-4) -->
             <p id="sidebar-subtitle-names" 
                class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out">
             </p>
@@ -185,7 +185,7 @@
         // --- GLOBAL CONSTANTS & STATE ---
         const NEW_TITLE = "Does the Way Words Relate Mirror the Paths of Human Thought?";
         const SUBTITLE_HEADER = "Applied Data Analysis project \n Team ADAm ondra";
-        // MODIFIED: Formatting the names for tighter display (multiple per line)
+        // Formatting the names for tighter display (multiple per line)
         const SUBTITLE_NAMES = "David Brantschen, Nathan Mutin \n Valentin Planes, Julie Terreaux \n Guillaume Delamare";
 
         let currentTopicIndex = 0;
@@ -277,13 +277,14 @@
 
         // --- CORE CHAT FUNCTIONS ---
 
-        function addToSidebar(topicIndex, title) {
+        // MODIFIED: Accepts the correct message ID to jump to.
+        function addToSidebar(topicIndex, title, startMessageId) {
             // Only add the main topic title to the sidebar once
             if (document.getElementById(`topic-link-${topicIndex}`)) return;
             
             const li = document.createElement('div');
             li.innerHTML = `
-                <button id="topic-link-${topicIndex}" onclick="jumpToMessage(${currentStepIndex})" class="sidebar-item w-full text-left px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <button id="topic-link-${topicIndex}" onclick="jumpToMessage(${startMessageId})" class="sidebar-item w-full text-left px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
                     <span class="text-[10px] font-bold bg-slate-200 text-slate-500 w-5 h-5 flex items-center justify-center rounded-full">${topicIndex + 1}</span>
                     <span class="truncate">${title}</span>
                 </button>
@@ -437,11 +438,14 @@
             totalHumanMessages++;
             // We use totalHumanMessages as the message ID for linking back from the sidebar
             const humanMsgId = totalHumanMessages; 
+
+            // Check if this is the start of a new topic before adding the message
+            const isNewTopicStart = currentStepIndex === 0;
+
             addMessage('human', stepData.human, 'none', humanMsgId); 
 
-            // If this is the start of a new topic, add it to the sidebar
-            if (currentStepIndex === 0) {
-                // Pass the ID of the current human message, which is the start of the topic
+            // If this is the start of a new topic, add it to the sidebar, passing the ID of the current message
+            if (isNewTopicStart) {
                 addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
             }
 
