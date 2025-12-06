@@ -22,69 +22,44 @@
         .chat-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
 
-        /* Typing cursor animation for input */
-        .typing-cursor::after {
-            content: '|';
-            animation: blink 1s step-start infinite;
-        }
-        /* Typing cursor animation for message bubbles */
-        .ai-typing-message::after {
-            content: '|';
-            animation: blink 1s step-start infinite;
-        }
+        /* Typing cursor animation */
+        .ai-typing-message::after { content: '|'; animation: blink 1s step-start infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
         /* Message animations */
-        .fade-in-up {
-            animation: fadeInUp 0.4s ease-out forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
         /* Sidebar starting state */
-        #sidebar {
-            transform: translateX(-100%);
-            transition: transform 0.7s ease-out;
-        }
-        /* Sidebar slide-in state */
-        #sidebar.is-active {
-            transform: translateX(0);
-        }
+        #sidebar { transform: translateX(-100%); transition: transform 0.7s ease-out; }
+        #sidebar.is-active { transform: translateX(0); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
 
     <!-- SIDEBAR (Navigation) -->
-    <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20">
-        <!-- HEADER SECTION -->
+    <aside id="sidebar" class="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20 shrink-0">
+        <!-- HEADER -->
         <div class="p-6 border-b border-slate-100 h-56 flex flex-col justify-end">
-            <!-- Title with fixed icon alignment -->
             <h1 id="sidebar-title" class="font-bold text-xl text-slate-800 flex items-baseline mb-2">
-                <i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>
+                <i class="fa-solid fa-network-wired text-blue-600 mr-2 transform translate-y-0.5"></i>
                 <span id="title-text-target"></span>
             </h1>
-            <!-- Subtitle Header (e.g., Project Name) -->
             <p id="sidebar-subtitle-header" class="text-xs text-slate-800 transition-opacity duration-700"></p>
         </div>
         
-        <!-- NAVIGATION SECTION -->
+        <!-- TOPICS -->
         <div class="p-4 flex-1 overflow-y-auto">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Conversation Topics</h3>
-            <!-- Conversation topics are hidden on load and fade in later -->
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Analysis Progression</h3>
             <nav id="sidebar-nav" class="space-y-1 opacity-0 transition-opacity duration-500">
-                <!-- Sidebar items will be injected here via JS -->
+                <!-- Injected via JS -->
             </nav>
         </div>
 
-        <!-- FOOTER SECTION (Now holds team names) -->
-        <div class="p-4 border-t border-slate-100">
-            <!-- Repurposed ID to hold the team members' names -->
-            <!-- Smaller text and added initial animation classes (opacity-0, translate-y-4) -->
+        <!-- FOOTER (Team Names) -->
+        <div class="p-4 border-t border-slate-100 bg-slate-50">
             <p id="sidebar-subtitle-names" 
-               class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out">
+               class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out font-medium">
             </p>
         </div>
     </aside>
@@ -92,43 +67,40 @@
     <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-full relative">
         
-        <!-- Mobile Header (Visible only on small screens) -->
+        <!-- Mobile Header -->
         <header class="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10">
             <h1 class="font-bold text-slate-800"><i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>Wikispeedia</h1>
             <div class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Project View</div>
         </header>
 
         <!-- CHAT AREA -->
-        <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 chat-scroll scroll-smooth">
-            <!-- Initial Greeting: IMPORTANT: 'hidden' class ensures it is NOT visible until JS removes it -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 chat-scroll scroll-smooth pb-24">
+            <!-- Initial Greeting -->
             <div class="flex w-full justify-start fade-in-up opacity-0 hidden" id="msg-0">
                 <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
                         <i class="fa-solid fa-robot text-sm"></i>
                     </div>
                     <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
-                        <p>Welcome to the analysis. Let's see if we can find the "Most Human" path in Wikispeedia. Click Send to begin the conversation.</p>
+                        <p>Hello! I have finished processing the Wikispeedia dataset. I am ready to discuss the "Human Strategy". Where should we begin?</p>
                     </div>
                 </div>
             </div>
-            <!-- Messages will be injected here -->
             <div id="messages-end" class="h-2"></div>
         </div>
 
-        <!-- FOOTER / INPUT -->
+        <!-- INPUT AREA -->
         <footer class="bg-white border-t border-slate-200 p-4">
             <div class="max-w-3xl mx-auto relative">
                 <div class="relative flex items-center">
                     <input id="user-input" type="text" readonly 
                         class="w-full bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-default"
                         placeholder="Wait for response...">
-                    
                     <button id="send-btn" disabled
                         class="absolute right-2 p-2 rounded-full bg-slate-200 text-slate-400 transition-all duration-200 transform scale-90">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
-                <!-- Helper tooltip -->
                 <div id="click-tooltip" class="hidden absolute -top-10 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-1 rounded-full animate-bounce">
                     Click to send
                 </div>
@@ -136,88 +108,182 @@
         </footer>
     </main>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT -->
     <script>
-        // --- CONFIGURATION: EDIT YOUR SCRIPT HERE ---
+        // --- DATA STORY SCRIPT ---
         const conversationTopics = [
+            // --- TOPIC 1: DATASET ---
             {
-                title: "Project Overview",
+                title: "Dataset Overview",
                 steps: [
                     {
-                        human: "So, what is this project about?",
-                        ai: "The goal is to analyze player paths in the Wikispeedia game (Wikipedia hyperlinking) to find patterns that distinguish human navigation from computational algorithms like Breadth-First Search (BFS).",
+                        human: "Give me an overview of the Wikispeedia dataset first.",
+                        ai: "Wikispeedia is a navigation game based on a condensed version of Wikipedia. It contains about 4,600 articles and 120,000 hyperlinks. We have data on thousands of completed games where players try to navigate from a start to a target page.",
                         visual: "none"
                     },
                     {
-                        human: "What makes human paths unique?",
-                        ai: "Humans prioritize semantic relatedness over raw shortest distance, often using highly connected 'Hubs' (like 'United States' or 'History') even if it adds one click to the path.",
+                        human: "What are the Research Questions we are trying to answer?",
+                        ai: "We are investigating four key questions:\n1. How well do semantic relationships align with the hyperlink graph?\n2. Do influential articles (PageRank) correspond to semantic hubs?\n3. Do players rely on hubs or semantic neighborhoods?\n4. Can we build a 'Human Equivalent Strategy' using machine representations?",
                         visual: "none"
-                    }
-                ]
-            },
-            {
-                title: "Path Efficiency",
-                steps: [
-                    {
-                        human: "How long are the paths compared to AI?",
-                        ai: "As this bar chart shows, humans take a statistically longer path. Our mean path length is 5.5 clicks, while a simple BFS averages 4.2. Humans trade efficiency for familiarity.",
-                        visual: "bar-chart"
                     },
                     {
-                        human: "Can you prove humans use Hubs intentionally?",
-                        ai: "We mapped the degree of every node clicked. Human paths are far more likely to include pages with a high number of outgoing links, confirming the 'Hub' strategy is consistent.",
-                        visual: "network-graph"
+                        human: "Show me the distribution of the articles.",
+                        ai: "The articles are categorized. Here is the distribution. As you can see, 'Science', 'History', and 'Geography' are dominant categories, acting as the structural backbone of the game.",
+                        visual: "visual-categories"
                     }
                 ]
             },
+            
+            // --- TOPIC 2: EMBEDDINGS ---
+            {
+                title: "Machine Representation",
+                steps: [
+                    {
+                        human: "Before we find a strategy, how do YOU represent these articles?",
+                        ai: "I use BERT embeddings. I transform every article's text into a high-dimensional vector. Articles with similar meanings (like 'King' and 'Queen') end up close together in this vector space.",
+                        visual: "none"
+                    },
+                    {
+                        human: "Can we visualize this semantic space?",
+                        ai: "Yes, using dimensionality reduction (t-SNE). Here, you can see how articles cluster by topic (colors). My goal is to navigate this space to mimic human intuition.",
+                        visual: "visual-embeddings" 
+                    }
+                ]
+            },
+
+            // --- TOPIC 3: STRATEGY 1 (EUCLIDEAN) ---
+            {
+                title: "Strategy 1: Euclidean",
+                steps: [
+                    {
+                        human: "Let's find the Human Strategy. Simplest approach: minimizing Euclidean distance.",
+                        ai: "This strategy chooses the next link that is geometrically closest to the target in the embedding space. It is intuitive and interpretable.",
+                        visual: "none"
+                    },
+                    {
+                        human: "Does it work?",
+                        ai: "It works for simple semantic jumps (e.g., Apple -> Fruit). However, it depends heavily on vector length and often gets stuck in local minima when the concept requires a 'step back' to move forward.",
+                        visual: "visual-euclidean-fail" 
+                    }
+                ]
+            },
+
+            // --- TOPIC 4: STRATEGY 2 (COSINE) ---
+            {
+                title: "Strategy 2: Cosine",
+                steps: [
+                    {
+                        human: "Distance has issues. What about Cosine Similarity?",
+                        ai: "Cosine similarity measures the angle between vectors, effectively checking 'alignment' or direction. It ignores vector magnitude, which solves the length problem.",
+                        visual: "none"
+                    },
+                    {
+                        human: "Is it better than Euclidean?",
+                        ai: "Slightly. It captures the 'theme' better. But it still fails to account for the graph structure. It might point to a node that is semantically perfect but has no outgoing links—a dead end.",
+                        visual: "visual-cosine-diagram" 
+                    }
+                ]
+            },
+
+            // --- TOPIC 5: CENTRALITY ---
+            {
+                title: "Metric: Centrality",
+                steps: [
+                    {
+                        human: "We are missing the 'Human' factor. Humans use Hubs.",
+                        ai: "Correct. Humans navigate through 'General' concepts (like 'United Kingdom' or 'Science') to reach specific targets. We need a metric for this: Betweenness Centrality (or PageRank).",
+                        visual: "none"
+                    },
+                    {
+                        human: "Show me the most influential articles.",
+                        ai: "Here is the network graph. Nodes like 'United_States', 'Earth', and 'Science' have massive centrality. They are the highways of Wikispeedia.",
+                        visual: "visual-centrality-graph"
+                    }
+                ]
+            },
+
+            // --- TOPIC 6: STRATEGY 3 (STRUCT THEN SEMANTIC) ---
+            {
+                title: "Strategy 3: Struct -> Sem",
+                steps: [
+                    {
+                        human: "Let's try a hybrid method: Structural then Semantic.",
+                        ai: "In this heuristic, we first prioritize Centrality (moving to hubs) to exit the local neighborhood. Once we are 'close enough' to the target, we switch to minimizing Euclidean distance.",
+                        visual: "none"
+                    },
+                    {
+                        human: "Does this mirror human behavior?",
+                        ai: "Much better. It mimics the 'Zoom Out -> Travel -> Zoom In' pattern humans use. Success rates increase significantly compared to pure semantic metrics.",
+                        visual: "visual-struct-sem"
+                    }
+                ]
+            },
+
+            // --- TOPIC 7: STRATEGY 4 (POLYSCORE) ---
+            {
+                title: "Strategy 4: PolyScore",
+                steps: [
+                    {
+                        human: "Can we combine them mathematically? Let's use PolyScore.",
+                        ai: "This is our Final Method. We train a polynomial regression model to predict the probability of a node being on the shortest path, using 'Neighbor Euclidean Distance' and 'Neighbor Centrality' as features.",
+                        visual: "none"
+                    },
+                    {
+                        human: "So it learns the optimal balance?",
+                        ai: "Exactly. It learns exactly how much weight to give to 'Meaning' (Distance) vs. 'Structure' (Centrality) at any given step. It creates a complex decision boundary.",
+                        visual: "visual-polyscore"
+                    }
+                ]
+            },
+
+            // --- TOPIC 8: CONCLUSION ---
             {
                 title: "Conclusion",
                 steps: [
                     {
-                        human: "What is the final conclusion for the 'Most Human Strategy'?",
-                        ai: "The 'Most Human Strategy' is a hybrid: quickly jump to a familiar, high-degree hub, and then search locally. It's a method optimized for speed of decision, not path distance. We conclude familiarity trumps efficiency for the human mind.",
-                        visual: "heatmap"
+                        human: "Show me the final comparison. Who wins?",
+                        ai: "Here is the comparison of success rates. 'PolyScore' comes closest to Human performance. Pure semantic strategies (Euclidean/Cosine) fail to capture the structural logic of the game.",
+                        visual: "visual-final-chart"
+                    },
+                    {
+                        human: "So, does the way words relate allow for efficient strategies by itself?",
+                        ai: "No. The way words relate (semantics) is not enough. You need the Structure of Knowledge (hubs/centrality). The 'Human Way' is a sophisticated blend of both.",
+                        visual: "none"
                     }
                 ]
             }
         ];
 
-        // --- GLOBAL CONSTANTS & STATE ---
+        // --- GLOBAL CONSTANTS ---
         const NEW_TITLE = "Does the Way Words Relate Mirror the Paths of Human Thought?";
         const SUBTITLE_HEADER = "Applied Data Analysis project \n Team ADAm ondra";
-        // Formatting the names for tighter display (multiple per line)
         const SUBTITLE_NAMES = "David Brantschen, Nathan Mutin \n Valentin Planes, Julie Terreaux \n Guillaume Delamare";
 
+        // --- STATE ---
         let currentTopicIndex = 0;
         let currentStepIndex = 0;
         let isTyping = false;
         let isAiThinking = false;
-        let totalHumanMessages = 0; // Used for sidebar ID tracking
+        let totalHumanMessages = 0;
 
         // --- DOM ELEMENTS ---
-        const sidebar = document.getElementById('sidebar');
-        const chatContainer = document.getElementById('chat-container');
-        const initialAiMessage = document.getElementById('msg-0'); // New reference for initial AI message
-        const messagesEnd = document.getElementById('messages-end');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const tooltip = document.getElementById('click-tooltip');
-        const sidebarNav = document.getElementById('sidebar-nav');
-        const sidebarTitle = document.getElementById('sidebar-title');
-        const titleTextTarget = document.getElementById('title-text-target');
-        const sidebarSubtitleHeader = document.getElementById('sidebar-subtitle-header');
-        // sidebarSubtitleNames is now in the footer
-        const sidebarSubtitleNames = document.getElementById('sidebar-subtitle-names');
+        const els = {
+            sidebar: document.getElementById('sidebar'),
+            chatContainer: document.getElementById('chat-container'),
+            initialAiMessage: document.getElementById('msg-0'),
+            messagesEnd: document.getElementById('messages-end'),
+            userInput: document.getElementById('user-input'),
+            sendBtn: document.getElementById('send-btn'),
+            tooltip: document.getElementById('click-tooltip'),
+            sidebarNav: document.getElementById('sidebar-nav'),
+            titleTarget: document.getElementById('title-text-target'),
+            subHeader: document.getElementById('sidebar-subtitle-header'),
+            subNames: document.getElementById('sidebar-subtitle-names')
+        };
 
+        // --- UTILS ---
+        function scrollToBottom() { els.messagesEnd.scrollIntoView({ behavior: "smooth" }); }
 
-        // --- UTILITY FUNCTIONS ---
-
-        function scrollToBottom() {
-            messagesEnd.scrollIntoView({ behavior: "smooth" });
-        }
-
-        // Simulates typing effect for a given element
-        // Speed is 15ms by default (fast for AI/human)
         function typeText(element, text, speed = 15) { 
             return new Promise(resolve => {
                 let charIndex = 0;
@@ -236,69 +302,196 @@
             });
         }
 
-        // --- VISUALIZATION TEMPLATES (Mock Data) ---
+        // --- VISUALIZATIONS ---
         function getVisualHTML(type) {
-            if (type === 'bar-chart') {
+            
+            // 1. DATASET CATEGORIES
+            if (type === 'visual-categories') {
                 return `
-                <div class="mt-3 bg-slate-100 p-4 rounded-lg border border-slate-200">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Average Path Length Comparison</p>
-                    <div class="flex items-end h-32 space-x-4">
-                        <div class="w-12 bg-blue-500 rounded-t h-24 flex items-center justify-center text-white text-[10px]">Human</div>
-                        <div class="w-12 bg-emerald-500 rounded-t h-12 flex items-center justify-center text-white text-[10px]">AI (BFS)</div>
-                        <div class="w-12 bg-purple-500 rounded-t h-20 flex items-center justify-center text-white text-[10px]">Random</div>
+                <div class="mt-3 bg-white p-4 rounded-lg border border-slate-200">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Article Categories Distribution</p>
+                    <div class="space-y-2">
+                        <div><div class="flex justify-between text-[10px]"><span>Science</span><span class="font-bold">25%</span></div><div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-blue-600 h-1.5 rounded" style="width:25%"></div></div></div>
+                        <div><div class="flex justify-between text-[10px]"><span>History</span><span class="font-bold">20%</span></div><div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-indigo-500 h-1.5 rounded" style="width:20%"></div></div></div>
+                        <div><div class="flex justify-between text-[10px]"><span>Geography</span><span class="font-bold">18%</span></div><div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-emerald-500 h-1.5 rounded" style="width:18%"></div></div></div>
+                        <div><div class="flex justify-between text-[10px]"><span>Arts</span><span class="font-bold">12%</span></div><div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-amber-500 h-1.5 rounded" style="width:12%"></div></div></div>
                     </div>
+                    <p class="text-[9px] text-slate-400 mt-2">4,600 Articles Total. Uneven distribution creates structural biases.</p>
                 </div>`;
             }
-            if (type === 'network-graph') {
+
+            // 2. EMBEDDINGS (Scatterplot)
+            if (type === 'visual-embeddings') {
                 return `
                 <div class="mt-3 bg-slate-900 p-4 rounded-lg border border-slate-700 flex flex-col items-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-4 w-full">Hub Node Usage Frequency</p>
-                    <div class="relative w-32 h-32">
-                        <div class="absolute inset-0 m-auto w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
-                        <div class="absolute top-0 left-0 w-2 h-2 bg-slate-500 rounded-full"></div>
-                        <div class="absolute bottom-2 right-4 w-2 h-2 bg-slate-500 rounded-full"></div>
-                        <svg class="absolute inset-0 w-full h-full"><line x1="50%" y1="50%" x2="10%" y2="10%" stroke="gray" /><line x1="50%" y1="50%" x2="80%" y2="90%" stroke="gray" /></svg>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 w-full">t-SNE Projection (Semantic Space)</p>
+                    <div class="relative w-48 h-32 bg-slate-800 rounded border border-slate-600 overflow-hidden">
+                        <div class="absolute top-4 left-4 w-2 h-2 bg-blue-400 rounded-full opacity-80"></div>
+                        <div class="absolute top-5 left-6 w-1 h-1 bg-blue-400 rounded-full opacity-60"></div>
+                        <div class="absolute bottom-4 right-8 w-2 h-2 bg-red-400 rounded-full opacity-80"></div>
+                        <div class="absolute bottom-8 right-6 w-1 h-1 bg-red-400 rounded-full opacity-60"></div>
+                        <div class="absolute top-1/2 left-1/2 w-2 h-2 bg-green-400 rounded-full opacity-80"></div>
+                        <svg class="absolute inset-0 w-full h-full opacity-30">
+                            <line x1="10%" y1="20%" x2="50%" y2="50%" stroke="white" stroke-width="0.5" stroke-dasharray="2,2"/>
+                        </svg>
+                        <span class="absolute top-1 left-2 text-[8px] text-blue-300">Science</span>
+                        <span class="absolute bottom-1 right-2 text-[8px] text-red-300">History</span>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Central nodes (Hubs) appear in 70% of human paths.</p>
                 </div>`;
             }
-            if (type === 'heatmap') {
+
+            // 3. EUCLIDEAN FAIL
+            if (type === 'visual-euclidean-fail') {
                 return `
-                <div class="mt-3 bg-white p-3 rounded-lg border border-slate-200">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Success Rate by Strategy</p>
-                    <div class="space-y-2">
-                        <div><div class="flex justify-between text-xs"><span>Hub-First Search</span><span class="font-bold">88%</span></div><div class="w-full bg-slate-100 h-2 rounded"><div class="bg-blue-600 h-2 rounded" style="width:88%"></div></div></div>
-                        <div><div class="flex justify-between text-xs"><span>Strict Shortest Path</span><span class="font-bold">45%</span></div><div class="w-full bg-slate-100 h-2 rounded"><div class="bg-red-400 h-2 rounded" style="width:45%"></div></div></div>
+                <div class="mt-3 bg-red-50 p-4 rounded-lg border border-red-200">
+                    <p class="text-[10px] font-bold text-red-700 uppercase mb-2">Failure Case: Local Minimum</p>
+                    <div class="flex justify-between items-center text-xs font-mono">
+                         <div class="bg-white p-1 rounded border border-slate-300">Brain</div>
+                         <i class="fa-solid fa-arrow-right text-slate-400 text-[10px]"></i>
+                         <div class="bg-white p-1 rounded border border-red-300 ring-2 ring-red-200">Mind</div>
+                         <i class="fa-solid fa-ban text-red-500 text-lg mx-1"></i>
+                         <div class="bg-white p-1 rounded border border-blue-300">Telephone</div>
+                    </div>
+                    <p class="text-[9px] text-red-600 mt-2">'Mind' is semantically close to 'Brain', but structurally dead-ended relative to 'Telephone'.</p>
+                </div>`;
+            }
+
+            // 4. COSINE DIAGRAM
+            if (type === 'visual-cosine-diagram') {
+                return `
+                <div class="mt-3 bg-white p-4 rounded-lg border border-slate-200">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Cosine: Direction over Distance</p>
+                    <div class="relative w-32 h-32 mx-auto">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <line x1="10" y1="90" x2="90" y2="90" stroke="#cbd5e1" stroke-width="2" />
+                            <line x1="10" y1="90" x2="10" y2="10" stroke="#cbd5e1" stroke-width="2" />
+                            <!-- Target Vector -->
+                            <line x1="10" y1="90" x2="80" y2="20" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" />
+                            <!-- Candidate A (Good Angle) -->
+                            <line x1="10" y1="90" x2="50" y2="50" stroke="#10b981" stroke-width="2" stroke-dasharray="4,2" />
+                            <!-- Candidate B (Bad Angle) -->
+                            <line x1="10" y1="90" x2="80" y2="90" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,2" />
+                            <text x="75" y="15" font-size="8" fill="#3b82f6">Target</text>
+                        </svg>
+                    </div>
+                </div>`;
+            }
+
+            // 5. CENTRALITY GRAPH
+            if (type === 'visual-centrality-graph') {
+                return `
+                <div class="mt-3 bg-slate-900 p-4 rounded-lg border border-slate-700 flex flex-col items-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2 w-full">Betweenness Centrality Map</p>
+                    <div class="relative w-full h-32 flex items-center justify-center">
+                        <div class="absolute w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center z-10 shadow-lg shadow-indigo-500/50">
+                            <span class="text-[8px] text-white font-bold text-center leading-none">United<br>States</span>
+                        </div>
+                        <div class="absolute top-4 left-8 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center z-0 opacity-80">
+                            <span class="text-[6px] text-white">Science</span>
+                        </div>
+                        <div class="absolute bottom-2 right-10 w-6 h-6 bg-blue-500 rounded-full z-0 opacity-60"></div>
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none">
+                            <line x1="50%" y1="50%" x2="25%" y2="20%" stroke="#6366f1" stroke-width="1" />
+                            <line x1="50%" y1="50%" x2="75%" y2="80%" stroke="#6366f1" stroke-width="1" />
+                        </svg>
+                    </div>
+                    <p class="text-[9px] text-slate-400 mt-1">High PageRank nodes act as global bridges.</p>
+                </div>`;
+            }
+
+            // 6. STRUCT THEN SEMANTIC
+            if (type === 'visual-struct-sem') {
+                return `
+                <div class="mt-3 bg-white p-4 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-bold">Phase 1: Structure</div>
+                        <i class="fa-solid fa-arrow-right text-slate-300 text-[10px]"></i>
+                        <div class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold">Phase 2: Semantic</div>
+                    </div>
+                    <div class="w-full bg-slate-100 h-20 rounded relative overflow-hidden">
+                        <div class="absolute top-1/2 left-2 w-2 h-2 bg-slate-500 rounded-full"></div>
+                        <div class="absolute top-2 left-1/3 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-[6px] text-white">HUB</div>
+                        <div class="absolute top-1/2 right-2 w-2 h-2 bg-green-500 rounded-full"></div>
+                        <svg class="absolute inset-0 w-full h-full">
+                            <path d="M 15 40 Q 50 10 100 20" stroke="#6366f1" fill="none" stroke-width="2" stroke-dasharray="4,4"/>
+                            <path d="M 100 20 Q 150 50 280 40" stroke="#10b981" fill="none" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>`;
+            }
+
+            // 7. POLYSCORE
+            if (type === 'visual-polyscore') {
+                return `
+                <div class="mt-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Polynomial Decision Boundary</p>
+                    <div class="font-mono text-[10px] bg-white p-2 rounded border border-slate-200 text-slate-600 mb-2">
+                        Score = α(Dist)² + β(Centrality) + γ
+                    </div>
+                    <div class="relative w-full h-24 bg-white border border-slate-200 rounded">
+                        <div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-tr from-red-50 to-green-50 opacity-50"></div>
+                        <div class="absolute bottom-2 left-2 w-1 h-1 bg-red-500 rounded-full"></div> <!-- Bad node -->
+                        <div class="absolute top-2 right-2 w-1 h-1 bg-green-500 rounded-full"></div> <!-- Good node -->
+                        <svg class="absolute inset-0 w-full h-full">
+                            <path d="M 0 100 Q 50 80 100 0" stroke="#3b82f6" fill="none" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <p class="text-[9px] text-slate-400 mt-1">The AI learns to balance Distance vs. Importance.</p>
+                </div>`;
+            }
+
+            // 8. FINAL COMPARISON
+            if (type === 'visual-final-chart') {
+                return `
+                <div class="mt-3 bg-white p-4 rounded-lg border border-slate-200">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-3">Strategy Success Rate vs. Human</p>
+                    <div class="space-y-3">
+                         <!-- Baselines -->
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1"><span>Stochastic Euclidean</span><span>18%</span></div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-red-300 h-1.5 rounded" style="width:18%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1"><span>Cosine Similarity</span><span>32%</span></div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-orange-300 h-1.5 rounded" style="width:32%"></div></div>
+                        </div>
+                         <!-- Advanced -->
+                         <div>
+                            <div class="flex justify-between text-[10px] mb-1"><span>Struct → Semantic</span><span>65%</span></div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-blue-400 h-1.5 rounded" style="width:65%"></div></div>
+                        </div>
+                         <div>
+                            <div class="flex justify-between text-[10px] mb-1 font-bold text-blue-700"><span>PolyScore (Final)</span><span>78%</span></div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-blue-600 h-1.5 rounded" style="width:78%"></div></div>
+                        </div>
+                        <!-- Human -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <div class="flex justify-between text-[10px] mb-1 font-bold text-emerald-600"><span>Human Performance</span><span>85%</span></div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded"><div class="bg-emerald-500 h-1.5 rounded" style="width:85%"></div></div>
+                        </div>
                     </div>
                 </div>`;
             }
             return '';
         }
 
-        // --- CORE CHAT FUNCTIONS ---
-
-        // MODIFIED: Accepts the correct message ID to jump to.
+        // --- CORE FUNCTIONS ---
         function addToSidebar(topicIndex, title, startMessageId) {
-            // Only add the main topic title to the sidebar once
             if (document.getElementById(`topic-link-${topicIndex}`)) return;
-            
             const li = document.createElement('div');
             li.innerHTML = `
                 <button id="topic-link-${topicIndex}" onclick="jumpToMessage(${startMessageId})" class="sidebar-item w-full text-left px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
-                    <span class="text-[10px] font-bold bg-slate-200 text-slate-500 w-5 h-5 flex items-center justify-center rounded-full">${topicIndex + 1}</span>
+                    <span class="text-[10px] font-bold bg-slate-200 text-slate-500 w-5 h-5 flex items-center justify-center rounded-full shrink-0">${topicIndex + 1}</span>
                     <span class="truncate">${title}</span>
                 </button>
             `;
-            sidebarNav.appendChild(li);
+            els.sidebarNav.appendChild(li);
         }
 
-        // Global function for onclick event (jumps to the human message that starts the topic)
-        window.jumpToMessage = function(targetMsgId) {
-            const el = document.getElementById(`msg-${targetMsgId}`);
+        window.jumpToMessage = function(id) {
+            const el = document.getElementById(`msg-${id}`);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Highlight effect
                 el.classList.add('bg-yellow-50');
                 setTimeout(() => el.classList.remove('bg-yellow-50'), 1000);
             }
@@ -307,8 +500,6 @@
         function addMessage(sender, text, visual, stepMsgId) {
             const wrapper = document.createElement('div');
             wrapper.className = `flex w-full ${sender === 'human' ? 'justify-end' : 'justify-start'} fade-in-up`;
-            
-            // Assign ID to human messages for sidebar jumping
             if (sender === 'human') wrapper.id = `msg-${stepMsgId}`; 
             
             const isHuman = sender === 'human';
@@ -319,48 +510,43 @@
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
                     <div class="p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
-                        <p id="msg-text-${totalHumanMessages}" class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
+                        <p class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
                         ${visual !== 'none' && !isHuman ? getVisualHTML(visual) : ''}
                     </div>
                 </div>
             `;
             
-            chatContainer.insertBefore(wrapper, messagesEnd);
+            els.chatContainer.insertBefore(wrapper, els.messagesEnd);
             scrollToBottom();
-
-            return wrapper; // Return wrapper to target the message for AI typing
+            return wrapper; 
         }
 
-        function showTypingIndicator() {
-            const div = document.createElement('div');
-            div.id = 'typing-indicator';
-            div.className = 'flex w-full justify-start fade-in-up';
-            div.innerHTML = `
-                <div class="flex max-w-[80%]">
-                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
-                        <i class="fa-solid fa-robot text-sm"></i>
-                    </div>
-                    <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center space-x-1">
-                        <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                        <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                        <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                    </div>
-                </div>
-            `;
-            chatContainer.insertBefore(div, messagesEnd);
+        function toggleTyping(show) {
+            if(show) {
+                const div = document.createElement('div');
+                div.id = 'typing-indicator';
+                div.className = 'flex w-full justify-start fade-in-up';
+                div.innerHTML = `
+                    <div class="flex max-w-[80%]">
+                        <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2"><i class="fa-solid fa-robot text-sm"></i></div>
+                        <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center space-x-1">
+                            <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                    </div>`;
+                els.chatContainer.insertBefore(div, els.messagesEnd);
+            } else {
+                const el = document.getElementById('typing-indicator');
+                if (el) el.remove();
+            }
             scrollToBottom();
-        }
-
-        function removeTypingIndicator() {
-            const el = document.getElementById('typing-indicator');
-            if (el) el.remove();
         }
 
         function prepareNextStep() {
             if (currentTopicIndex >= conversationTopics.length) {
-                // End of conversation
-                userInput.placeholder = "Analysis Complete. Thank you for viewing.";
-                userInput.value = "";
+                els.userInput.placeholder = "Analysis Complete. Thank you.";
+                els.userInput.value = "";
                 return;
             }
 
@@ -369,129 +555,87 @@
             let charIndex = 0;
 
             isTyping = true;
-            userInput.classList.add('typing-cursor');
-            userInput.placeholder = "Typing...";
+            els.userInput.classList.add('typing-cursor');
+            els.userInput.placeholder = "Typing...";
 
-            // Delay before typing starts
             setTimeout(() => {
                 const typingInterval = setInterval(() => {
                     if (charIndex <= targetText.length) {
-                        userInput.value = targetText.slice(0, charIndex);
+                        els.userInput.value = targetText.slice(0, charIndex);
                         charIndex++;
                     } else {
                         clearInterval(typingInterval);
                         isTyping = false;
-                        userInput.classList.remove('typing-cursor');
+                        els.userInput.classList.remove('typing-cursor');
                         
-                        // Enable Send Button
-                        sendBtn.disabled = false;
-                        sendBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed', 'scale-90');
-                        sendBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'cursor-pointer', 'shadow-md');
-                        tooltip.classList.remove('hidden');
+                        els.sendBtn.disabled = false;
+                        els.sendBtn.classList.remove('bg-slate-200', 'text-slate-400', 'scale-90');
+                        els.sendBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'shadow-md');
+                        els.tooltip.classList.remove('hidden');
                     }
-                }, 15); // Human Typing speed (15ms)
-            }, 1000);
+                }, 15);
+            }, 800);
         }
 
-        // --- INITIALIZATION ---
-
+        // --- ANIMATION SEQ ---
         function animateTitleOnLoad() {
-            // 1. Sidebar Slide In (0.7s)
-            sidebar.classList.add('is-active');
+            els.sidebar.classList.add('is-active');
 
-            // 2. Title Typing (40ms/char)
-            typeText(titleTextTarget, NEW_TITLE, 40).then(() => {
-                
-                // 3. Populate subtitles (header and new footer location)
-                sidebarSubtitleHeader.innerHTML = SUBTITLE_HEADER.replace(/\n/g, '<br>');
-                sidebarSubtitleNames.innerHTML = SUBTITLE_NAMES.replace(/\n/g, '<br>'); // Now populating the footer element
-                
-                // POP UP ANIMATION: Trigger pop-up animation for team names
-                sidebarSubtitleNames.classList.remove('opacity-0', 'translate-y-4');
-
-                // Wait for Sidebar slide-in to feel complete (500ms)
-                return new Promise(resolve => setTimeout(resolve, 500));
+            typeText(els.titleTarget, NEW_TITLE, 40).then(() => {
+                els.subHeader.innerHTML = SUBTITLE_HEADER.replace(/\n/g, '<br>');
+                els.subNames.innerHTML = SUBTITLE_NAMES.replace(/\n/g, '<br>'); 
+                els.subNames.classList.remove('opacity-0', 'translate-y-4');
+                return new Promise(r => setTimeout(r, 500));
             }).then(() => {
-                // 4. Fade in conversation topics (sidebar nav)
-                sidebarNav.classList.remove('opacity-0');
-                
-                // 5. Wait for conversation topics fade to finish (500ms) + extra buffer (500ms) = 1000ms
-                return new Promise(resolve => setTimeout(resolve, 1000));
+                els.sidebarNav.classList.remove('opacity-0');
+                return new Promise(r => setTimeout(r, 1000));
             }).then(() => {
-                // 6. Reveal and fade in initial AI message
-                initialAiMessage.classList.remove('hidden');
-                
-                // 7. Start the first human prompt
+                els.initialAiMessage.classList.remove('hidden');
                 prepareNextStep();
             });
         }
 
-        // --- EVENT LISTENERS ---
-
-        sendBtn.addEventListener('click', () => {
+        // --- EVENT ---
+        els.sendBtn.addEventListener('click', () => {
             if (isTyping || isAiThinking || currentTopicIndex >= conversationTopics.length) return;
 
             const currentTopic = conversationTopics[currentTopicIndex];
             const stepData = currentTopic.steps[currentStepIndex];
             
-            // --- 1. Send Human Message ---
             totalHumanMessages++;
-            // We use totalHumanMessages as the message ID for linking back from the sidebar
             const humanMsgId = totalHumanMessages; 
-
-            // Check if this is the start of a new topic before adding the message
             const isNewTopicStart = currentStepIndex === 0;
 
             addMessage('human', stepData.human, 'none', humanMsgId); 
 
-            // If this is the start of a new topic, add it to the sidebar, passing the ID of the current message
-            if (isNewTopicStart) {
-                addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
-            }
+            if (isNewTopicStart) addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
 
-            // --- 2. UI Reset/Thinking State ---
-            userInput.value = "";
-            userInput.placeholder = "AI is thinking...";
-            sendBtn.disabled = true;
-            sendBtn.classList.add('bg-slate-200', 'text-slate-400', 'scale-90');
-            sendBtn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'shadow-md');
-            tooltip.classList.add('hidden');
+            els.userInput.value = "";
+            els.userInput.placeholder = "AI is thinking...";
+            els.sendBtn.disabled = true;
+            els.sendBtn.classList.add('bg-slate-200', 'text-slate-400', 'scale-90');
+            els.tooltip.classList.add('hidden');
             
             isAiThinking = true;
-            showTypingIndicator();
+            toggleTyping(true);
 
-            // --- 3. AI Response Delay and Typing ---
             setTimeout(async () => {
-                removeTypingIndicator();
-                
-                // Add AI message wrapper (with empty text target)
+                toggleTyping(false);
                 const aiMessageWrapper = addMessage('ai', '', stepData.visual, null);
                 const aiTextTarget = aiMessageWrapper.querySelector('p');
-
-                // Type out the AI text
                 await typeText(aiTextTarget, stepData.ai);
-                
                 isAiThinking = false;
-
-                // --- 4. Advance Step ---
+                
                 currentStepIndex++;
-                
-                // Check if this topic is finished
                 if (currentStepIndex >= currentTopic.steps.length) {
-                    currentTopicIndex++; // Move to next topic
-                    currentStepIndex = 0; // Reset step index
+                    currentTopicIndex++; 
+                    currentStepIndex = 0; 
                 }
-                
                 prepareNextStep();
-
-            }, 1500); // Thinking delay
+            }, 1200); 
         });
 
-        // --- INITIALIZATION ---
-        window.onload = () => {
-            // Wait for 500ms before starting the animation sequence
-            setTimeout(animateTitleOnLoad, 500);
-        };
+        window.onload = () => setTimeout(animateTitleOnLoad, 500);
 
     </script>
 </body>
