@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wikispeedia Analysis - Human vs AI</title>
     
-    <!-- Tailwind CSS (for styling) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Icons (Lucide/FontAwesome alternative for HTML) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -48,9 +45,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
 
-    <!-- SIDEBAR (Navigation) -->
     <aside id="sidebar" class="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20 shrink-0">
-        <!-- HEADER -->
         <div class="p-6 border-b border-slate-100 h-56 flex flex-col justify-end">
             <h1 class="font-bold text-xl text-slate-800 flex items-baseline mb-2">
                 <i class="fa-solid fa-network-wired text-blue-600 mr-2 transform translate-y-0.5"></i>
@@ -59,15 +54,12 @@
             <p id="sidebar-subtitle-header" class="text-xs text-slate-800 transition-opacity duration-700"></p>
         </div>
         
-        <!-- TOPICS -->
         <div class="p-4 flex-1 overflow-y-auto">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Conversation Topics</h3>
             <nav id="sidebar-nav" class="space-y-1 opacity-0 transition-opacity duration-500">
-                <!-- Injected via JS -->
-            </nav>
+                </nav>
         </div>
 
-        <!-- FOOTER (Team Names) -->
         <div class="p-4 border-t border-slate-100 bg-slate-50">
             <p id="sidebar-subtitle-names" 
                class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out font-medium">
@@ -75,24 +67,20 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-full relative">
         
-        <!-- Mobile Header -->
         <header class="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10">
             <h1 class="font-bold text-slate-800"><i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>Wikispeedia</h1>
             <div class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Project View</div>
         </header>
 
-        <!-- CHAT AREA -->
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 chat-scroll scroll-smooth pb-24">
-            <!-- Initial Greeting -->
             <div class="flex w-full justify-start fade-in-up opacity-0 hidden" id="msg-0">
                 <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
                         <i class="fa-solid fa-robot text-sm"></i>
                     </div>
-                    <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
+                    <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-normal break-words">
                         <p>Hi! I was looking at the Wikispeedia dataset that you were talking about earlier and I was wondering if you’d have some time to chat about it.</p>
                     </div>
                 </div>
@@ -100,11 +88,9 @@
             <div id="messages-end" class="h-2"></div>
         </div>
 
-        <!-- INPUT AREA -->
         <footer class="bg-white border-t border-slate-200 p-4">
             <div class="max-w-3xl mx-auto relative flex items-end gap-2">
                 <div class="relative w-full">
-                    <!-- Changed to textarea for multi-line support -->
                     <textarea id="user-input" readonly rows="1" 
                         class="w-full bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-3xl py-3 px-5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-default resize-none overflow-hidden"
                         placeholder="Wait for response..."></textarea>
@@ -120,7 +106,6 @@
         </footer>
     </main>
 
-    <!-- JAVASCRIPT -->
     <script>
         // --- DATA STORY SCRIPT ---
         // Structure: steps contains an array of interaction pairs.
@@ -239,7 +224,7 @@
                             { text: "And here's a table summarizing the results:", visual: "table-distance-similarity-titles-performance" },
                             { text: "Oh… So while the Euclidean distance and cosine similarity methods outperform the humans in success rates, they do tend to take longer paths on average. As for the stochastic Euclidean distance method, well lets just say that it’s performance isn’t great… On the flip side, it does capture the much more “organic” look of the human paths in terms of Euclidean distance and cosine similarity evolution during the games!", visual: "none" }
                         ]
-                    },
+                    }
                     {
                         human: "Yes, it does look like the randomness introduced by the stochastic methods do somewhat harm the performance of this method. But there is one thing that I’ve been thinking about: right now, you’re only using the embedding of the article’s titles, right? But when a human sees the Wikipedia article’s title, they usually have some representation or general of what the article is about, and I feel like that information is lost when only considering embeddings of the titles.",
                         ai: [
@@ -467,7 +452,7 @@
                     <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
-                    <div class="p-4 rounded-2xl shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
+                    <div class="p-3 rounded-2xl shadow-sm text-sm leading-normal whitespace-pre-wrap break-words ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
                         <p class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
                         ${visual !== 'none' && !isHuman ? getVisualHTML(visual) : ''}
                     </div>
@@ -504,7 +489,7 @@
         function prepareNextStep() {
             if (currentTopicIndex >= conversationTopics.length) {
                 els.userInput.value = "";
-                els.userInput.placeholder = "Analysis Complete. Thank you.";
+                els.userInput.placeholder = "Analysis Complete. Thank thank you.";
                 els.sendBtn.disabled = true;
                 return;
             }
