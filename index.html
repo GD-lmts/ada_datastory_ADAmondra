@@ -443,7 +443,8 @@
         window.jumpToMessage = function(id) {
             const el = document.getElementById(`msg-${id}`);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // FIX: Changed block: 'center' to block: 'start' to scroll the element to the top
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 el.classList.add('bg-yellow-50');
                 setTimeout(() => el.classList.remove('bg-yellow-50'), 1000);
             }
