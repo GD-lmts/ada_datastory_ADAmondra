@@ -515,6 +515,7 @@
             let charIndex = 0;
 
             isTyping = true;
+            // FIX: Added the defined class for visual typing cursor simulation
             els.userInput.classList.add('typing-cursor');
             els.userInput.placeholder = ""; // Clear placeholder for typing effect
             
@@ -530,7 +531,8 @@
                     } else {
                         clearInterval(typingInterval);
                         isTyping = false;
-                        els.userInput.classList.remove('typing-cursor');
+                        // FIX: Remove the defined class
+                        els.userInput.classList.remove('typing-cursor'); 
                         
                         els.sendBtn.disabled = false;
                         els.sendBtn.classList.remove('bg-slate-200', 'text-slate-400', 'scale-90');
@@ -561,6 +563,7 @@
 
         // --- EVENT ---
         els.sendBtn.addEventListener('click', async () => {
+            // Guard clause for clean finish
             if (isTyping || isAiThinking || currentTopicIndex >= conversationTopics.length) return;
 
             const currentTopic = conversationTopics[currentTopicIndex];
@@ -589,10 +592,17 @@
             // 2. Process AI Responses (Loop through array)
             // Initial delay before first bubble
             await new Promise(r => setTimeout(r, 1000)); 
+            
+            // FIX: Remove the initial thinking indicator *once* after the delay, before the first message text starts.
+            toggleTyping(false); 
 
             for (let i = 0; i < stepData.ai.length; i++) {
-                // Ensure typing indicator is removed before adding message
-                toggleTyping(false);
+                
+                // FIX: If we are not the first bubble, the indicator was turned on for a pause 
+                // in the previous step, so we turn it off here before generating the new bubble.
+                if (i > 0) {
+                    toggleTyping(false);
+                }
                 
                 const aiResponse = stepData.ai[i];
                 const aiMessageWrapper = addMessage('ai', '', aiResponse.visual, null);
@@ -603,7 +613,7 @@
                 
                 // If there are more bubbles, show typing indicator again and wait
                 if (i < stepData.ai.length - 1) {
-                    toggleTyping(true);
+                    toggleTyping(true); // Show indicator for the pause
                     await new Promise(r => setTimeout(r, 800)); // Delay between bubbles
                 }
             }
