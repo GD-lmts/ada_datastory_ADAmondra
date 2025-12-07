@@ -35,6 +35,7 @@
         @keyframes blink { 50% { opacity: 0; } }
 
         /* Message animations */
+        /* Note: showAllConversation removes this class for instant display */
         .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; opacity: 0; transform: translateY(10px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
@@ -61,6 +62,11 @@
         </div>
 
         <div class="p-4 border-t border-slate-100 bg-slate-50">
+            <button onclick="showAllConversation()" id="show-all-btn" 
+                class="w-full text-center px-4 py-2 mb-3 text-xs font-semibold rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors">
+                <i class="fa-solid fa-angles-down mr-1"></i> Show All Conversation
+            </button>
+            
             <p id="sidebar-subtitle-names" 
                class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out font-medium">
             </p>
@@ -329,8 +335,9 @@
         let currentStepIndex = 0;
         let currentAiMessageIndex = 0; // Tracks the current bubble within a step
         let isTyping = false;
-        let isAiThinking = false; // Controls if the main input is locked (during AI sequence or typing)
+        let isAiThinking = false; // Controls if the main input is locked (during AI sequence)
         let totalHumanMessages = 0;
+        let humanTypingIntervalId = null; // FIX: Global variable to track the human typing animation
 
         // --- DOM ELEMENTS ---
         const els = {
@@ -363,7 +370,8 @@
                     if (charIndex < text.length) {
                         element.innerText += text.charAt(charIndex);
                         charIndex++;
-                        scrollToBottom();
+                        // Keep scroll behavior for live typing
+                        scrollToBottom(); 
                     } else {
                         clearInterval(interval);
                         element.classList.remove('ai-typing-message');
@@ -441,6 +449,7 @@
             }
         };
 
+        // MODIFIED: Removed the unconditional scrollToBottom call. It will now only scroll via typeText.
         function addMessage(sender, text, visual, stepMsgId) {
             const wrapper = document.createElement('div');
             wrapper.className = `flex w-full ${sender === 'human' ? 'justify-end' : 'justify-start'} fade-in-up`;
@@ -461,7 +470,7 @@
             `;
             
             els.chatContainer.insertBefore(wrapper, els.messagesEnd);
-            scrollToBottom();
+            // SCROLL REMOVED: No more unconditional scroll here.
             return wrapper; 
         }
 
@@ -487,7 +496,7 @@
             scrollToBottom();
         }
 
-        // NEW: Functions to manage the inline 'Keep Generating' button
+        // Functions to manage the inline 'Keep Generating' button
         function removeContinueButton() {
             const btn = document.getElementById('continue-btn-wrapper');
             if (btn) btn.remove();
@@ -505,7 +514,7 @@
             `;
             // Insert right before the end marker
             els.chatContainer.insertBefore(wrapper, els.messagesEnd);
-            scrollToBottom();
+            scrollToBottom(); // Keep scroll here to ensure button is visible
         }
 
 
@@ -567,6 +576,7 @@
             
             if (currentTopicIndex >= conversationTopics.length) {
                 els.userInput.value = "";
+                els.userInput.readOnly = true;
                 els.userInput.placeholder = "Analysis Complete. Thank you.";
                 els.sendBtn.disabled = true;
                 return;
@@ -587,13 +597,15 @@
             els.userInput.style.height = 'auto';
 
             setTimeout(() => {
-                const typingInterval = setInterval(() => {
+                // FIX: Store the interval ID globally so it can be cleared by showAllConversation
+                humanTypingIntervalId = setInterval(() => {
                     if (charIndex <= targetText.length) {
                         els.userInput.value = targetText.slice(0, charIndex);
                         autoResize(els.userInput); // Auto-expand height
                         charIndex++;
                     } else {
-                        clearInterval(typingInterval);
+                        clearInterval(humanTypingIntervalId);
+                        humanTypingIntervalId = null; // Reset global variable
                         isTyping = false;
                         // Set input state for human turn
                         els.userInput.readOnly = false; // Now editable
@@ -610,6 +622,100 @@
                 }, 10); // Faster typing for better UX on long texts
             }, 800);
         }
+        
+        // MODIFIED: Removed the final scrollToBottom() call.
+        window.showAllConversation = function() {
+            
+            // 1. Force state reset
+            if (isTyping) {
+                // FIX: Stop the human typing animation interval if it's running
+                if (humanTypingIntervalId !== null) {
+                    clearInterval(humanTypingIntervalId);
+                    humanTypingIntervalId = null;
+                }
+
+                // Clear the partially typed text if it was interrupted
+                els.userInput.value = ""; 
+                els.userInput.classList.remove('typing-cursor');
+                isTyping = false;
+            }
+            removeContinueButton();
+            toggleTyping(false);
+            
+            // 2. Clear chat area and sidebar navigation
+            els.chatContainer.innerHTML = ''; // Clear all messages and the end marker
+            els.chatContainer.appendChild(els.messagesEnd); // Re-add the end marker
+            els.sidebarNav.innerHTML = ''; // Clear topic links
+
+            // Manually render the initial AI message (msg-0's content)
+            // NOTE: This does not call addMessage, so no implicit scroll here.
+            const initialMessageHTML = `
+                <div class="flex w-full justify-start" id="msg-0">
+                    <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
+                        <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
+                            <i class="fa-solid fa-robot text-sm"></i>
+                        </div>
+                        <div class="bg-white border border-slate-200 py-2 px-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
+                            <p>Hi! I was looking at the Wikispeedia dataset that you were talking about earlier and I was wondering if you’d have some time to chat about it.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            els.chatContainer.insertBefore(document.createRange().createContextualFragment(initialMessageHTML), els.messagesEnd);
+
+
+            // 3. Iterate and render all messages instantly
+            let totalHumanMessagesRendered = 0;
+            
+            conversationTopics.forEach((topic, topicIdx) => {
+                topic.steps.forEach((step, stepIdx) => {
+                    totalHumanMessagesRendered++;
+                    const humanMsgId = totalHumanMessagesRendered;
+
+                    // A. Render Human Message
+                    // addMessage no longer scrolls
+                    const humanWrapper = addMessage('human', step.human, 'none', humanMsgId);
+                    humanWrapper.classList.remove('fade-in-up'); // Instant render
+
+                    // Also ensure the topic is added to the sidebar
+                    if (stepIdx === 0) {
+                        addToSidebar(topicIdx, topic.title, humanMsgId);
+                    }
+
+                    // B. Render All AI Messages
+                    step.ai.forEach(aiResponse => {
+                        // addMessage no longer scrolls
+                        const aiMessageWrapper = addMessage('ai', '', aiResponse.visual, null);
+                        const aiTextTarget = aiMessageWrapper.querySelector('.ai-text-target');
+                        
+                        // Fill instantly and remove animation class for instant rendering
+                        if(aiTextTarget) aiTextTarget.innerText = aiResponse.text;
+                        aiMessageWrapper.classList.remove('fade-in-up'); 
+                    });
+                });
+            });
+
+            // 4. Finalize state
+            currentTopicIndex = conversationTopics.length;
+            currentStepIndex = 0;
+            totalHumanMessages = totalHumanMessagesRendered; // Sync global state
+            isAiThinking = false;
+            
+            // 5. Lock the input area
+            els.userInput.value = ""; // Ensure value is cleared
+            els.userInput.readOnly = true;
+            els.userInput.placeholder = "Analysis Complete. Thank you.";
+            els.sendBtn.disabled = true;
+            els.sendBtn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'shadow-md');
+            els.sendBtn.classList.add('bg-slate-200', 'text-slate-400', 'scale-90');
+            if (els.tooltip) els.tooltip.classList.add('hidden');
+            
+            // Disable the "Show All" button after use
+            document.getElementById('show-all-btn').disabled = true;
+
+            // SCROLL REMOVED: Do not scroll to the very end
+        };
+
 
         // --- ANIMATION SEQ ---
         function animateTitleOnLoad() {
@@ -645,6 +751,9 @@
             // 1. Add Human Message
             addMessage('human', stepData.human, 'none', humanMsgId); 
 
+            // Scroll to show the human message right after it's added (since addMessage no longer scrolls)
+            scrollToBottom(); 
+            
             if (isNewTopicStart) addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
 
             // Lock Input/Button for AI turn
