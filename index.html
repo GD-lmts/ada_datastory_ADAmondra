@@ -176,7 +176,7 @@
                 title: "Strategy 1: Euclidean distance",
                 steps: [
                     {
-                        human: "Ok so now that you have a mathematical representation map representing the semantics of the articles, could you just use the Euclidean distance in this map as a measure of semantic closeness?",
+                        human: "Ok so now that you have a mathematical representation of the article's semantics, could you just use the Euclidean distance in this map as a measure of semantic closeness?",
                         ai: [
                             { text: "That’s a great idea! In fact when we look at the paths taken by human players, we can see the how they gradually drift away from the starting article, and progress towards articles that are closer - in a Euclidian distance sense - to the target article:", visual: "human-euclidean-distance" },
                             { text: "So, one strategy could be, at each step along the path to choose the next article by prioritizing those that are closest to the target article in the embeddings maps! For instance, if we currently are at article X, and our goal is article Y, we simply compute the distance from every one of X’s neighbours to the goal and chose the closest one that isn’t already in the path.", visual: "none" },
