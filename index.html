@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wikispeedia Analysis - Human vs AI</title>
     
-    <!-- Tailwind CSS (for styling) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Icons (Lucide/FontAwesome alternative for HTML) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -48,9 +45,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
 
-    <!-- SIDEBAR (Navigation) -->
     <aside id="sidebar" class="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col h-full shadow-lg z-20 shrink-0">
-        <!-- HEADER -->
         <div class="p-6 border-b border-slate-100 h-56 flex flex-col justify-end">
             <h1 class="font-bold text-xl text-slate-800 flex items-baseline mb-2">
                 <i class="fa-solid fa-network-wired text-blue-600 mr-2 transform translate-y-0.5"></i>
@@ -59,15 +54,12 @@
             <p id="sidebar-subtitle-header" class="text-xs text-slate-800 transition-opacity duration-700"></p>
         </div>
         
-        <!-- TOPICS -->
         <div class="p-4 flex-1 overflow-y-auto">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Conversation Topics</h3>
             <nav id="sidebar-nav" class="space-y-1 opacity-0 transition-opacity duration-500">
-                <!-- Injected via JS -->
-            </nav>
+                </nav>
         </div>
 
-        <!-- FOOTER (Team Names) -->
         <div class="p-4 border-t border-slate-100 bg-slate-50">
             <p id="sidebar-subtitle-names" 
                class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out font-medium">
@@ -75,24 +67,20 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-full relative">
         
-        <!-- Mobile Header -->
         <header class="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10">
             <h1 class="font-bold text-slate-800"><i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>Wikispeedia</h1>
             <div class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Project View</div>
         </header>
 
-        <!-- CHAT AREA -->
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 chat-scroll scroll-smooth pb-24">
-            <!-- Initial Greeting -->
             <div class="flex w-full justify-start fade-in-up opacity-0 hidden" id="msg-0">
                 <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2">
                         <i class="fa-solid fa-robot text-sm"></i>
                     </div>
-                    <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
+                    <div class="bg-white border border-slate-200 py-2 px-4 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
                         <p>Hi! I was looking at the Wikispeedia dataset that you were talking about earlier and I was wondering if you’d have some time to chat about it.</p>
                     </div>
                 </div>
@@ -100,11 +88,9 @@
             <div id="messages-end" class="h-2"></div>
         </div>
 
-        <!-- INPUT AREA -->
         <footer class="bg-white border-t border-slate-200 p-4">
             <div class="max-w-3xl mx-auto relative flex items-end gap-2">
                 <div class="relative w-full">
-                    <!-- Changed to textarea for multi-line support -->
                     <textarea id="user-input" readonly rows="1" 
                         class="w-full bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-3xl py-3 px-5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-default resize-none overflow-hidden"
                         placeholder="Wait for response..."></textarea>
@@ -120,7 +106,6 @@
         </footer>
     </main>
 
-    <!-- JAVASCRIPT -->
     <script>
         // --- DATA STORY SCRIPT ---
         // Structure: steps contains an array of interaction pairs.
@@ -342,8 +327,9 @@
         // --- STATE ---
         let currentTopicIndex = 0;
         let currentStepIndex = 0;
+        let currentAiMessageIndex = 0; // Tracks the current bubble within a step
         let isTyping = false;
-        let isAiThinking = false;
+        let isAiThinking = false; // Controls if the main input is locked (during AI sequence or typing)
         let totalHumanMessages = 0;
 
         // --- DOM ELEMENTS ---
@@ -467,7 +453,7 @@
                     <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
-                    <div class="p-4 rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
+                    <div class="py-2 px-4 rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
                         <p class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
                         ${visual !== 'none' && !isHuman ? getVisualHTML(visual) : ''}
                     </div>
@@ -487,7 +473,7 @@
                 div.innerHTML = `
                     <div class="flex max-w-[80%]">
                         <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center mt-1 mx-2"><i class="fa-solid fa-robot text-sm"></i></div>
-                        <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center space-x-1">
+                        <div class="bg-white border border-slate-200 py-2 px-4 rounded-2xl rounded-tl-none shadow-sm flex items-center space-x-1">
                             <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
                             <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
                             <div class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
@@ -501,7 +487,84 @@
             scrollToBottom();
         }
 
+        // NEW: Functions to manage the inline 'Keep Generating' button
+        function removeContinueButton() {
+            const btn = document.getElementById('continue-btn-wrapper');
+            if (btn) btn.remove();
+        }
+
+        window.insertContinueButton = function() {
+            const wrapper = document.createElement('div');
+            wrapper.id = 'continue-btn-wrapper';
+            wrapper.className = 'flex justify-start w-full my-4 fade-in-up';
+            wrapper.innerHTML = `
+                <button onclick="generateNextAiBubble()" 
+                    class="px-5 py-2 text-sm font-semibold rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-600 transition-colors transform hover:scale-[1.01] flex items-center">
+                    <i class="fa-solid fa-angle-down mr-2 -mt-[1px]"></i> Keep Generating
+                </button>
+            `;
+            // Insert right before the end marker
+            els.chatContainer.insertBefore(wrapper, els.messagesEnd);
+            scrollToBottom();
+        }
+
+
+        // Function to generate the next AI bubble and manage the 'Keep Generating' pause
+        async function generateNextAiBubble() {
+            // 0. Remove the previous 'Keep Generating' button if it exists
+            removeContinueButton();
+            
+            const currentTopic = conversationTopics[currentTopicIndex];
+            const stepData = currentTopic.steps[currentStepIndex];
+            const aiResponses = stepData.ai;
+
+            // 1. Set general AI turn state (lock input)
+            // The input and send button should remain locked during the entire AI sequence.
+            els.sendBtn.disabled = true;
+            els.userInput.readOnly = true;
+            els.userInput.placeholder = "AI is generating..."; 
+            
+            // 2. Turn off typing indicator if it was on (from the initial delay/pause)
+            toggleTyping(false);
+
+            // 3. Generate the message bubble
+            const aiResponse = aiResponses[currentAiMessageIndex];
+            const aiMessageWrapper = addMessage('ai', '', aiResponse.visual, null);
+            const aiTextTarget = aiMessageWrapper.querySelector('p');
+            
+            // 4. Type the text
+            // isAiThinking is true from the click handler, marking the start of the sequence.
+            await typeText(aiTextTarget, aiResponse.text);
+
+            // 5. Check if there are more bubbles
+            currentAiMessageIndex++;
+            if (currentAiMessageIndex < aiResponses.length) {
+                // More bubbles exist, pause and inject the 'Keep Generating' button
+                insertContinueButton();
+                // isAiThinking remains true, locking the footer input.
+
+            } else {
+                // Sequence finished, transition back to human turn
+                isAiThinking = false; // AI sequence is fully complete
+                
+                // 6. Advance to next step (topic/step)
+                const nextTopic = conversationTopics[currentTopicIndex];
+                currentStepIndex++;
+                if (currentStepIndex >= nextTopic.steps.length) {
+                    currentTopicIndex++; 
+                    currentStepIndex = 0; 
+                }
+                
+                // 7. Prepare for next human input
+                prepareNextStep();
+            }
+        }
+
+
         function prepareNextStep() {
+            // Ensure any existing continue button is gone
+            removeContinueButton();
+            
             if (currentTopicIndex >= conversationTopics.length) {
                 els.userInput.value = "";
                 els.userInput.placeholder = "Analysis Complete. Thank you.";
@@ -515,9 +578,10 @@
             let charIndex = 0;
 
             isTyping = true;
-            // FIX: Added the defined class for visual typing cursor simulation
+            // Set input state for human typing animation
+            els.userInput.readOnly = true; 
             els.userInput.classList.add('typing-cursor');
-            els.userInput.placeholder = ""; // Clear placeholder for typing effect
+            els.userInput.placeholder = ""; 
             
             // Reset height before typing
             els.userInput.style.height = 'auto';
@@ -531,12 +595,16 @@
                     } else {
                         clearInterval(typingInterval);
                         isTyping = false;
-                        // FIX: Remove the defined class
+                        // Set input state for human turn
+                        els.userInput.readOnly = false; // Now editable
                         els.userInput.classList.remove('typing-cursor'); 
                         
                         els.sendBtn.disabled = false;
                         els.sendBtn.classList.remove('bg-slate-200', 'text-slate-400', 'scale-90');
                         els.sendBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'shadow-md');
+                        
+                        // Set tooltip text for human turn
+                        if (els.tooltip) els.tooltip.textContent = "Click to send"; 
                         els.tooltip.classList.remove('hidden');
                     }
                 }, 10); // Faster typing for better UX on long texts
@@ -563,9 +631,10 @@
 
         // --- EVENT ---
         els.sendBtn.addEventListener('click', async () => {
-            // Guard clause for clean finish
+            // Guard clause: Human can only send if not typing (in animation) and not in the middle of an AI sequence.
             if (isTyping || isAiThinking || currentTopicIndex >= conversationTopics.length) return;
 
+            // --- HUMAN TURN LOGIC ---
             const currentTopic = conversationTopics[currentTopicIndex];
             const stepData = currentTopic.steps[currentStepIndex];
             
@@ -578,56 +647,23 @@
 
             if (isNewTopicStart) addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
 
-            // Reset Input
+            // Lock Input/Button for AI turn
             els.userInput.value = "";
             els.userInput.style.height = 'auto'; // Reset height
             els.userInput.placeholder = "AI is thinking...";
             els.sendBtn.disabled = true;
             els.sendBtn.classList.add('bg-slate-200', 'text-slate-400', 'scale-90');
-            els.tooltip.classList.add('hidden');
+            if (els.tooltip) els.tooltip.classList.add('hidden');
             
-            isAiThinking = true;
+            isAiThinking = true; // Block the send button until the full AI sequence finishes
             toggleTyping(true);
 
-            // 2. Process AI Responses (Loop through array)
-            // Initial delay before first bubble
+            // 2. Start the AI response sequence (Initial delay before first bubble)
             await new Promise(r => setTimeout(r, 1000)); 
             
-            // FIX: Remove the initial thinking indicator *once* after the delay, before the first message text starts.
-            toggleTyping(false); 
-
-            for (let i = 0; i < stepData.ai.length; i++) {
-                
-                // FIX: If we are not the first bubble, the indicator was turned on for a pause 
-                // in the previous step, so we turn it off here before generating the new bubble.
-                if (i > 0) {
-                    toggleTyping(false);
-                }
-                
-                const aiResponse = stepData.ai[i];
-                const aiMessageWrapper = addMessage('ai', '', aiResponse.visual, null);
-                const aiTextTarget = aiMessageWrapper.querySelector('p');
-                
-                // Type the text
-                await typeText(aiTextTarget, aiResponse.text);
-                
-                // If there are more bubbles, show typing indicator again and wait
-                if (i < stepData.ai.length - 1) {
-                    toggleTyping(true); // Show indicator for the pause
-                    await new Promise(r => setTimeout(r, 800)); // Delay between bubbles
-                }
-            }
-
-            isAiThinking = false;
-            
-            // 3. Advance to next step
-            currentStepIndex++;
-            if (currentStepIndex >= currentTopic.steps.length) {
-                currentTopicIndex++; 
-                currentStepIndex = 0; 
-            }
-            
-            prepareNextStep();
+            currentAiMessageIndex = 0;
+            // This function generates the first bubble and then pauses (via inline button) or completes the sequence.
+            await generateNextAiBubble(); 
         });
 
         window.onload = () => setTimeout(animateTitleOnLoad, 500);
