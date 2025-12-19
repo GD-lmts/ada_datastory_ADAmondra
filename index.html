@@ -466,21 +466,20 @@
             if (sender === 'human') wrapper.id = `msg-${stepMsgId}`; 
             
             const isHuman = sender === 'human';
-            // Check if there is a visual to display
             const hasVisual = visual !== 'none' && !isHuman; 
             
             wrapper.innerHTML = `
-            <div class="flex ${hasVisual ? 'w-full' : ''} max-w-[90%] md:max-w-[80%] ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
-                <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
-                    <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
+                <div class="flex ${hasVisual ? 'w-full' : ''} max-w-[90%] md:max-w-[80%] ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
+                    <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
+                        <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
+                    </div>
+                    <div class="${hasVisual ? 'w-full p-0 overflow-hidden' : 'py-2 px-4'} rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
+                        ${!isHuman && text ? `<div class="pt-3 px-4 pb-2"><p class="ai-text-target"></p></div>` : ''}
+                        ${isHuman ? `<p>${text}</p>` : ''}
+                        ${hasVisual ? `<div class="w-full h-full">${getVisualHTML(visual)}</div>` : ''}
+                    </div>
                 </div>
-                <div class="${hasVisual ? 'w-full p-0 overflow-hidden' : 'py-2 px-4'} rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
-                    ${!isHuman && text ? `<div class="pt-3 px-4 pb-2"><p class="ai-text-target"></p></div>` : ''}
-                    ${isHuman ? `<p>${text}</p>` : ''}
-                    ${hasVisual ? `<div class="w-full h-full">${getVisualHTML(visual)}</div>` : ''}
-                </div>
-            </div>
-        `;
+            `;
             
             els.chatContainer.insertBefore(wrapper, els.messagesEnd);
             return wrapper; 
