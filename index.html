@@ -6,42 +6,47 @@
     <title>Wikispeedia Analysis - Human vs AI</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
         body { font-family: 'Inter', sans-serif; }
         
-        /* Custom Scrollbar for Chat */
         .chat-scroll::-webkit-scrollbar { width: 6px; }
         .chat-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
 
-        /* Typing cursor animation for AI messages */
         .ai-typing-message::after { content: '|'; animation: blink 1s step-start infinite; }
         
-        /* FIX: Typing cursor animation for Human input (fixes perceived 'broken logic') */
         .typing-cursor { position: relative; }
         .typing-cursor::after {
             content: '|';
             position: absolute;
-            bottom: 0.75rem; /* Aligns with textarea padding-bottom: py-3 */
-            right: 2.25rem; /* Aligns visually near the text end */
+            bottom: 0.75rem;
+            right: 2.25rem;
             animation: blink 1s step-start infinite;
         }
 
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* Message animations */
-        /* Note: showAllConversation removes this class for instant display */
         .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; opacity: 0; transform: translateY(10px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* Sidebar starting state */
         #sidebar { transform: translateX(-100%); transition: transform 0.7s ease-out; }
         #sidebar.is-active { transform: translateX(0); }
+
+        /* Fix: Responsive Visual Containers */
+        .visual-container {
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .visual-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex">
@@ -57,8 +62,7 @@
         
         <div class="p-4 flex-1 overflow-y-auto">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Conversation Topics</h3>
-            <nav id="sidebar-nav" class="space-y-1 opacity-0 transition-opacity duration-500">
-                </nav>
+            <nav id="sidebar-nav" class="space-y-1 opacity-0 transition-opacity duration-500"></nav>
         </div>
 
         <div class="p-4 border-t border-slate-100 bg-slate-50">
@@ -66,15 +70,11 @@
                 class="w-full text-center px-4 py-2 mb-3 text-xs font-semibold rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors">
                 <i class="fa-solid fa-angles-down mr-1"></i> Show All Conversation
             </button>
-            
-            <p id="sidebar-subtitle-names" 
-               class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out font-medium">
-            </p>
+            <p id="sidebar-subtitle-names" class="text-[10px] text-slate-500 text-center leading-tight opacity-0 transform translate-y-4 transition-all duration-500 ease-out font-medium"></p>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col h-full relative">
-        
         <header class="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10">
             <h1 class="font-bold text-slate-800"><i class="fa-solid fa-network-wired text-blue-600 mr-2"></i>Wikispeedia</h1>
             <div class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Project View</div>
@@ -113,12 +113,7 @@
     </main>
 
     <script>
-        // --- DATA STORY SCRIPT ---
-        // Structure: steps contains an array of interaction pairs.
-        // Each pair has one 'human' prompt and an array of 'ai' responses (bubbles).
-        // NOTE: The 'text' fields in 'ai' messages now strictly follow the provided script.
         const conversationTopics = [
-            // --- TOPIC 1: INTRO ---
             {
                 title: "Introduction",
                 steps: [
@@ -142,8 +137,6 @@
                     }
                 ]
             },
-            
-            // --- TOPIC 2: RESEARCH QUESTIONS ---
             {
                 title: "Research Questions",
                 steps: [
@@ -155,8 +148,6 @@
                     }
                 ]
             },
-
-            // --- TOPIC 3: EMBEDDINGS ---
             {
                 title: "Embeddings",
                 steps: [
@@ -170,8 +161,6 @@
                     }
                 ]
             },
-
-            // --- TOPIC 4: STRATEGY 1 (EUCLIDEAN) ---
             {
                 title: "Strategy 1: Euclidean distance",
                 steps: [
@@ -185,8 +174,6 @@
                     }
                 ]
             },
-
-            // --- TOPIC 5: STRATEGY 2 ---
             {
                 title: "Strategy 2: Stochastic Euclidean distance",
                 steps: [
@@ -201,8 +188,6 @@
                     }
                 ]
             },
-
-            // --- TOPIC 6: STRATEGY 3 ---
             {
                 title: "Strategy 3: Cosine similarity",
                 steps: [
@@ -217,8 +202,6 @@
                     }
                 ]
             },
-
-            // --- TOPIC 7: STRATEGY 4 ---
             {
                 title: "Simulation of the semantic strategies",
                 steps: [
@@ -243,8 +226,6 @@
                     }
                 ]
             },
-
-            // --- TOPIC 8: ---
             {
                 title: "Adding structural information",
                 steps: [
@@ -266,8 +247,6 @@
                     }
                 ]
             },
-            
-            // --- TOPIC 9: ---
             {
                 title: "Strategy 4: Structural then semantic",
                 steps: [
@@ -282,11 +261,8 @@
                             { text: "Here are the results in table format:", visual: "table-centrality-performance" }
                         ]
                     }
-    
                 ]
             },
-
-            // --- TOPIC 10: ---
             {
                 title: "Strategy 5: Polyscore",
                 steps: [
@@ -301,11 +277,8 @@
                             { text: "When the embeddings are computed from the article titles only, this final strategy is found to marginally outperform every other one for success rates, while having slightly longer paths on average than the previous strategy. However, when the full first paragraphs are used for embedding, the polyscore strategy has the lowest average path length of all “machine” strategies!", visual: "none" }
                         ]
                     }
-    
                 ]
             },
-
-            // --- TOPIC 11: ---
             {
                 title: "Conclusion",
                 steps: [
@@ -320,26 +293,22 @@
                             { text: "5. Does the way words relate allow for efficient strategies by itself? \n The ways words relate, in a semantic sense, do make for reliable strategies. Indeed, both strategies based on cosine similarity and Euclidean distance outperform human’s success rates. However, efficiency is another issue as human paths are consistently shorter than the ones obtained solely by semantic relationships. By introducing a notion of structure, we managed to decrease this average path length, but it still is greater than for the human paths, hinting at a more complex balancing of structure and semantics in the human decision process or additional decision features that were not taken into account in these strategies.", visual: "none"}
                         ]
                     }
-    
                 ]
             }
         ];
 
-        // --- GLOBAL CONSTANTS ---
         const NEW_TITLE = "Does the Way Words Relate Mirror the Paths of Human Thought?";
         const SUBTITLE_HEADER = "Applied Data Analysis project \n Team ADAm Ondra";
         const SUBTITLE_NAMES = "David Brantschen, Nathan Mutin \n Valentin Planes, Julie Terreaux \n Guillaume Delamare";
 
-        // --- STATE ---
         let currentTopicIndex = 0;
         let currentStepIndex = 0;
-        let currentAiMessageIndex = 0; // Tracks the current bubble within a step
+        let currentAiMessageIndex = 0;
         let isTyping = false;
-        let isAiThinking = false; // Controls if the main input is locked (during AI sequence)
+        let isAiThinking = false;
         let totalHumanMessages = 0;
-        let humanTypingIntervalId = null; // FIX: Global variable to track the human typing animation
+        let humanTypingIntervalId = null;
 
-        // --- DOM ELEMENTS ---
         const els = {
             sidebar: document.getElementById('sidebar'),
             chatContainer: document.getElementById('chat-container'),
@@ -354,7 +323,6 @@
             subNames: document.getElementById('sidebar-subtitle-names')
         };
 
-        // --- UTILS ---
         function scrollToBottom() { els.messagesEnd.scrollIntoView({ behavior: "smooth" }); }
 
         function autoResize(textarea) {
@@ -370,7 +338,6 @@
                     if (charIndex < text.length) {
                         element.innerText += text.charAt(charIndex);
                         charIndex++;
-                        // Keep scroll behavior for live typing
                         scrollToBottom(); 
                     } else {
                         clearInterval(interval);
@@ -381,62 +348,59 @@
             });
         }
 
-        // --- VISUALIZATION GENERATOR (IMAGE PLACEHOLDERS) ---
+        // Updated for Automatic Height Adjustment
         function getVisualHTML(type) {
-        // Helper to create an interactive iframe
-        const createInteractivePlot = (filename) => `
-            <div class="mt-3 bg-white p-1 rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                <iframe 
-                    src="./plots/${filename}" 
-                    class="w-full h-[500px] rounded bg-slate-50" 
-                    frameborder="0" 
-                    scrolling="no">
-                </iframe>
-            </div>`;
+            const createInteractivePlot = (filename) => `
+                <div class="mt-3 bg-white p-1 rounded-lg border border-slate-200 shadow-sm visual-container overflow-hidden">
+                    <iframe 
+                        src="./plots/${filename}" 
+                        class="w-full min-h-[400px] md:min-h-[500px]" 
+                        frameborder="0" 
+                        scrolling="no"
+                        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px';">
+                    </iframe>
+                </div>`;
 
-        // Updated mappings based on the 'visual' fields in the conversationTopics data
-        const imageMap = {
-            'plot-categories': { file: 'articles_per_categories.html', interactive: true },
-            'table-links': { file: 'top_linked_articles.html', interactive: true },
-            'plot-path-stats': { file: 'finished_vs_unfinished.html', interactive: true },
-            'embeddings-tSNE': { file: 'tsne_embeddings.html', interactive: true },
-            'human-euclidean-distance': { file: 'TODO.html', interactive: true },
-            'machine-example-euclidean-distance':{ file: 'TODO.html', interactive: true },
-            'machine-example-stoch-euclidean-distance': { file: 'TODO.html', interactive: true },
-            'human-cosine-similarities': { file: 'TODO.html', interactive: true },
-            'machine-example-cosine-similarity': { file: 'TODO.html', interactive: true },
-            'plot-distance-similarity-titles-performance': { file: 'TODO.html', interactive: true },
-            'table-distance-similarity-titles-performance': { file: 'TODO.html', interactive: true },
-            'table-distance-similarity-beerarticle-performance': { file: 'TODO.html', interactive: true },
-            'plot-distance-similarity-paragraph-performance': { file: 'TODO.html', interactive: true },
-            'table-distance-similarity-paragraph-performance': { file: 'TODO.html', interactive: true },
-            'louvain-communities': { file: 'louvain_clustering.png', interactive: false },
-            'semantic-clusters': { file: 'hdbscan_clustering.png', interactive: false },
-            'jaccard-index': { file: 'jaccard_heatmap.png', interactive: false },
-            'human-centralitydelta-similaritydelta': { file: 'TODO.html', interactive: true },
-            'plot-centrality-performance': { file: 'TODO.html', interactive: true },
-            'table-centrality-performance': { file: 'TODO.html', interactive: true },
-            'hexes-polyfit': { file: 'TODO.html', interactive: true },
-            'plot-polyscore-performance': { file: 'TODO.html', interactive: true },
-            'table-polyscore-performance': { file: 'TODO.html', interactive: true },
-        };
+            const imageMap = {
+                'plot-categories': { file: 'articles_per_categories.html', interactive: true },
+                'table-links': { file: 'top_linked_articles.html', interactive: true },
+                'plot-path-stats': { file: 'finished_vs_unfinished.html', interactive: true },
+                'embeddings-tSNE': { file: 'tsne_embeddings.html', interactive: true },
+                'human-euclidean-distance': { file: 'TODO.html', interactive: true },
+                'machine-example-euclidean-distance':{ file: 'TODO.html', interactive: true },
+                'machine-example-stoch-euclidean-distance': { file: 'TODO.html', interactive: true },
+                'human-cosine-similarities': { file: 'TODO.html', interactive: true },
+                'machine-example-cosine-similarity': { file: 'TODO.html', interactive: true },
+                'plot-distance-similarity-titles-performance': { file: 'TODO.html', interactive: true },
+                'table-distance-similarity-titles-performance': { file: 'TODO.html', interactive: true },
+                'table-distance-similarity-beerarticle-performance': { file: 'TODO.html', interactive: true },
+                'plot-distance-similarity-paragraph-performance': { file: 'TODO.html', interactive: true },
+                'table-distance-similarity-paragraph-performance': { file: 'TODO.html', interactive: true },
+                'louvain-communities': { file: 'louvain_clustering.png', interactive: false },
+                'semantic-clusters': { file: 'hdbscan_clustering.png', interactive: false },
+                'jaccard-index': { file: 'jaccard_heatmap.png', interactive: false },
+                'human-centralitydelta-similaritydelta': { file: 'TODO.html', interactive: true },
+                'plot-centrality-performance': { file: 'TODO.html', interactive: true },
+                'table-centrality-performance': { file: 'TODO.html', interactive: true },
+                'hexes-polyfit': { file: 'TODO.html', interactive: true },
+                'plot-polyscore-performance': { file: 'TODO.html', interactive: true },
+                'table-polyscore-performance': { file: 'TODO.html', interactive: true },
+            };
 
-        const config = imageMap[type];
-        if (config) {
-            if (config.interactive) {
-                return createInteractivePlot(config.file);
-            } else {
-                // Fallback to your original image logic
-                return `
-                    <div class="mt-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-                        <img src="./plots/${config.file}" alt="${type}" class="w-full h-auto rounded">
-                    </div>`;
+            const config = imageMap[type];
+            if (config) {
+                if (config.interactive) {
+                    return createInteractivePlot(config.file);
+                } else {
+                    return `
+                        <div class="mt-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm visual-container">
+                            <img src="./plots/${config.file}" alt="${type}" class="rounded">
+                        </div>`;
+                }
             }
+            return '';
         }
-        return '';
-    }
 
-        // --- CORE FUNCTIONS ---
         function addToSidebar(topicIndex, title, startMessageId) {
             if (document.getElementById(`topic-link-${topicIndex}`)) return;
             const li = document.createElement('div');
@@ -452,29 +416,30 @@
         window.jumpToMessage = function(id) {
             const el = document.getElementById(`msg-${id}`);
             if (el) {
-                // FIX: Changed block: 'center' to block: 'start' to scroll the element to the top
                 el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 el.classList.add('bg-yellow-50');
                 setTimeout(() => el.classList.remove('bg-yellow-50'), 1000);
             }
         };
 
-        // MODIFIED: Removed the unconditional scrollToBottom call. It will now only scroll via typeText.
         function addMessage(sender, text, visual, stepMsgId) {
             const wrapper = document.createElement('div');
-            wrapper.className = `flex w-full ${sender === 'human' ? 'justify-end' : 'justify-start'} fade-in-up`;
-            if (sender === 'human') wrapper.id = `msg-${stepMsgId}`; 
-            
             const isHuman = sender === 'human';
-            // Check if there is a visual to display
             const hasVisual = visual !== 'none' && !isHuman; 
+
+            wrapper.className = `flex w-full ${isHuman ? 'justify-end' : 'justify-start'} fade-in-up`;
+            if (isHuman) wrapper.id = `msg-${stepMsgId}`; 
             
+            const bubbleClasses = hasVisual 
+                ? "w-full bg-white border border-slate-200 rounded-2xl rounded-tl-none shadow-sm" 
+                : (isHuman ? "bg-indigo-600 text-white rounded-tr-none" : "bg-white border border-slate-200 rounded-tl-none");
+
             wrapper.innerHTML = `
-                <div class="flex ${hasVisual ? 'w-full h-full' : ''} max-w-[90%] md:max-w-[75%] ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
+                <div class="flex ${hasVisual ? 'w-full' : 'max-w-[90%] md:max-w-[75%]'} ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
-                    <div class="${hasVisual ? 'w-full h-full' : ''} py-2 px-4 rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
+                    <div class="py-2 px-4 rounded-2xl shadow-sm text-sm leading-relaxed ${bubbleClasses}">
                         <p class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
                         ${hasVisual ? getVisualHTML(visual) : ''}
                     </div>
@@ -507,7 +472,6 @@
             scrollToBottom();
         }
 
-        // Functions to manage the inline 'Keep Generating' button
         function removeContinueButton() {
             const btn = document.getElementById('continue-btn-wrapper');
             if (btn) btn.remove();
@@ -523,68 +487,44 @@
                     <i class="fa-solid fa-angle-down mr-2 -mt-[1px]"></i> Keep Generating
                 </button>
             `;
-            // Insert right before the end marker
             els.chatContainer.insertBefore(wrapper, els.messagesEnd);
-            scrollToBottom(); // Keep scroll here to ensure button is visible
+            scrollToBottom();
         }
 
-
-        // Function to generate the next AI bubble and manage the 'Keep Generating' pause
         async function generateNextAiBubble() {
-            // 0. Remove the previous 'Keep Generating' button if it exists
             removeContinueButton();
-            
             const currentTopic = conversationTopics[currentTopicIndex];
             const stepData = currentTopic.steps[currentStepIndex];
             const aiResponses = stepData.ai;
 
-            // 1. Set general AI turn state (lock input)
-            // The input and send button should remain locked during the entire AI sequence.
             els.sendBtn.disabled = true;
             els.userInput.readOnly = true;
             els.userInput.placeholder = "AI is generating..."; 
             
-            // 2. Turn off typing indicator if it was on (from the initial delay/pause)
             toggleTyping(false);
 
-            // 3. Generate the message bubble
             const aiResponse = aiResponses[currentAiMessageIndex];
             const aiMessageWrapper = addMessage('ai', '', aiResponse.visual, null);
             const aiTextTarget = aiMessageWrapper.querySelector('p');
             
-            // 4. Type the text
-            // isAiThinking is true from the click handler, marking the start of the sequence.
             await typeText(aiTextTarget, aiResponse.text);
 
-            // 5. Check if there are more bubbles
             currentAiMessageIndex++;
             if (currentAiMessageIndex < aiResponses.length) {
-                // More bubbles exist, pause and inject the 'Keep Generating' button
                 insertContinueButton();
-                // isAiThinking remains true, locking the footer input.
-
             } else {
-                // Sequence finished, transition back to human turn
-                isAiThinking = false; // AI sequence is fully complete
-                
-                // 6. Advance to next step (topic/step)
-                const nextTopic = conversationTopics[currentTopicIndex];
+                isAiThinking = false; 
                 currentStepIndex++;
-                if (currentStepIndex >= nextTopic.steps.length) {
+                if (currentStepIndex >= currentTopic.steps.length) {
                     currentTopicIndex++; 
                     currentStepIndex = 0; 
                 }
-                
-                // 7. Prepare for next human input
                 prepareNextStep();
             }
         }
 
-
         function prepareNextStep() {
-            // Ensure any existing continue button is gone
             removeContinueButton();
-            
             if (currentTopicIndex >= conversationTopics.length) {
                 els.userInput.value = "";
                 els.userInput.readOnly = true;
@@ -599,53 +539,41 @@
             let charIndex = 0;
 
             isTyping = true;
-            // Set input state for human typing animation
             els.userInput.readOnly = true; 
             els.userInput.classList.add('typing-cursor');
             els.userInput.placeholder = ""; 
-            
-            // Reset height before typing
             els.userInput.style.height = 'auto';
 
             setTimeout(() => {
-                // FIX: Store the interval ID globally so it can be cleared by showAllConversation
                 humanTypingIntervalId = setInterval(() => {
                     if (charIndex <= targetText.length) {
                         els.userInput.value = targetText.slice(0, charIndex);
-                        autoResize(els.userInput); // Auto-expand height
+                        autoResize(els.userInput);
                         charIndex++;
                     } else {
                         clearInterval(humanTypingIntervalId);
-                        humanTypingIntervalId = null; // Reset global variable
+                        humanTypingIntervalId = null;
                         isTyping = false;
-                        // Set input state for human turn
-                        els.userInput.readOnly = false; // Now editable
+                        els.userInput.readOnly = false;
                         els.userInput.classList.remove('typing-cursor'); 
-                        
                         els.sendBtn.disabled = false;
                         els.sendBtn.classList.remove('bg-slate-200', 'text-slate-400', 'scale-90');
                         els.sendBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700', 'scale-100', 'shadow-md');
-                        
-                        // Set tooltip text for human turn
-                        if (els.tooltip) els.tooltip.textContent = "Click to send"; 
-                        els.tooltip.classList.remove('hidden');
+                        if (els.tooltip) {
+                            els.tooltip.textContent = "Click to send"; 
+                            els.tooltip.classList.remove('hidden');
+                        }
                     }
-                }, 10); // Faster typing for better UX on long texts
+                }, 10);
             }, 800);
         }
         
-        // MODIFIED: Removed the final scrollToBottom() call.
         window.showAllConversation = function() {
-            
-            // 1. Force state reset
             if (isTyping) {
-                // FIX: Stop the human typing animation interval if it's running
                 if (humanTypingIntervalId !== null) {
                     clearInterval(humanTypingIntervalId);
                     humanTypingIntervalId = null;
                 }
-
-                // Clear the partially typed text if it was interrupted
                 els.userInput.value = ""; 
                 els.userInput.classList.remove('typing-cursor');
                 isTyping = false;
@@ -653,13 +581,9 @@
             removeContinueButton();
             toggleTyping(false);
             
-            // 2. Clear chat area and sidebar navigation
-            els.chatContainer.innerHTML = ''; // Clear all messages and the end marker
-            els.chatContainer.appendChild(els.messagesEnd); // Re-add the end marker
-            els.sidebarNav.innerHTML = ''; // Clear topic links
+            els.chatContainer.innerHTML = ''; 
+            els.chatContainer.appendChild(els.messagesEnd); 
 
-            // Manually render the initial AI message (msg-0's content)
-            // NOTE: This does not call addMessage, so no implicit scroll here.
             const initialMessageHTML = `
                 <div class="flex w-full justify-start" id="msg-0">
                     <div class="flex max-w-[90%] md:max-w-[75%] flex-row">
@@ -670,50 +594,34 @@
                             <p>Hi! I was looking at the Wikispeedia dataset that you were talking about earlier and I was wondering if you’d have some time to chat about it.</p>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
             els.chatContainer.insertBefore(document.createRange().createContextualFragment(initialMessageHTML), els.messagesEnd);
 
-
-            // 3. Iterate and render all messages instantly
             let totalHumanMessagesRendered = 0;
-            
             conversationTopics.forEach((topic, topicIdx) => {
                 topic.steps.forEach((step, stepIdx) => {
                     totalHumanMessagesRendered++;
                     const humanMsgId = totalHumanMessagesRendered;
-
-                    // A. Render Human Message
-                    // addMessage no longer scrolls
                     const humanWrapper = addMessage('human', step.human, 'none', humanMsgId);
-                    humanWrapper.classList.remove('fade-in-up'); // Instant render
+                    humanWrapper.classList.remove('fade-in-up'); 
 
-                    // Also ensure the topic is added to the sidebar
-                    if (stepIdx === 0) {
-                        addToSidebar(topicIdx, topic.title, humanMsgId);
-                    }
+                    if (stepIdx === 0) addToSidebar(topicIdx, topic.title, humanMsgId);
 
-                    // B. Render All AI Messages
                     step.ai.forEach(aiResponse => {
-                        // addMessage no longer scrolls
                         const aiMessageWrapper = addMessage('ai', '', aiResponse.visual, null);
                         const aiTextTarget = aiMessageWrapper.querySelector('.ai-text-target');
-                        
-                        // Fill instantly and remove animation class for instant rendering
                         if(aiTextTarget) aiTextTarget.innerText = aiResponse.text;
                         aiMessageWrapper.classList.remove('fade-in-up'); 
                     });
                 });
             });
 
-            // 4. Finalize state
             currentTopicIndex = conversationTopics.length;
             currentStepIndex = 0;
-            totalHumanMessages = totalHumanMessagesRendered; // Sync global state
+            totalHumanMessages = totalHumanMessagesRendered;
             isAiThinking = false;
             
-            // 5. Lock the input area
-            els.userInput.value = ""; // Ensure value is cleared
+            els.userInput.value = "";
             els.userInput.readOnly = true;
             els.userInput.placeholder = "Analysis Complete. Thank you.";
             els.sendBtn.disabled = true;
@@ -721,17 +629,11 @@
             els.sendBtn.classList.add('bg-slate-200', 'text-slate-400', 'scale-90');
             if (els.tooltip) els.tooltip.classList.add('hidden');
             
-            // Disable the "Show All" button after use
             document.getElementById('show-all-btn').disabled = true;
-
-            // SCROLL REMOVED: Do not scroll to the very end
         };
 
-
-        // --- ANIMATION SEQ ---
         function animateTitleOnLoad() {
             els.sidebar.classList.add('is-active');
-
             typeText(els.titleTarget, NEW_TITLE, 40).then(() => {
                 els.subHeader.innerHTML = SUBTITLE_HEADER.replace(/\n/g, '<br>');
                 els.subNames.innerHTML = SUBTITLE_NAMES.replace(/\n/g, '<br>'); 
@@ -746,12 +648,8 @@
             });
         }
 
-        // --- EVENT ---
         els.sendBtn.addEventListener('click', async () => {
-            // Guard clause: Human can only send if not typing (in animation) and not in the middle of an AI sequence.
             if (isTyping || isAiThinking || currentTopicIndex >= conversationTopics.length) return;
-
-            // --- HUMAN TURN LOGIC ---
             const currentTopic = conversationTopics[currentTopicIndex];
             const stepData = currentTopic.steps[currentStepIndex];
             
@@ -759,35 +657,26 @@
             const humanMsgId = totalHumanMessages; 
             const isNewTopicStart = currentStepIndex === 0;
 
-            // 1. Add Human Message
             addMessage('human', stepData.human, 'none', humanMsgId); 
-
-            // Scroll to show the human message right after it's added (since addMessage no longer scrolls)
             scrollToBottom(); 
             
             if (isNewTopicStart) addToSidebar(currentTopicIndex, currentTopic.title, humanMsgId);
 
-            // Lock Input/Button for AI turn
             els.userInput.value = "";
-            els.userInput.style.height = 'auto'; // Reset height
+            els.userInput.style.height = 'auto';
             els.userInput.placeholder = "AI is thinking...";
             els.sendBtn.disabled = true;
             els.sendBtn.classList.add('bg-slate-200', 'text-slate-400', 'scale-90');
             if (els.tooltip) els.tooltip.classList.add('hidden');
             
-            isAiThinking = true; // Block the send button until the full AI sequence finishes
+            isAiThinking = true;
             toggleTyping(true);
-
-            // 2. Start the AI response sequence (Initial delay before first bubble)
             await new Promise(r => setTimeout(r, 1000)); 
-            
             currentAiMessageIndex = 0;
-            // This function generates the first bubble and then pauses (via inline button) or completes the sequence.
             await generateNextAiBubble(); 
         });
 
         window.onload = () => setTimeout(animateTitleOnLoad, 500);
-
     </script>
 </body>
 </html>
