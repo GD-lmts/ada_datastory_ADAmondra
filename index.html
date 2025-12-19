@@ -314,7 +314,7 @@
                         ai: [
                             { text: "Sure, here’s what we learned during this analysis:", visual: "none" },
                             { text: "1.	How well do semantic relationships align with clusters in Wikispeedia’s hyperlink graph?\n There is very limited overlap between the semantic clusters obtained by HDBSCAN of the embeddings space, and the Louvain communities that we got from the hyperlink graph. This means that both encode different types of information, which are used at different steps during the game by human players.", visual: "none" },
-                            { text: "2.	What are the key influential articles, and do they correspond to semantic hubs? \n ?????????????????", visual: "none" },
+                            { text: "2.	What are the key influential articles, and do they correspond to semantic hubs? \n By comparing the Louvain clustering of the graph and the hDBSCAN clustering in the “semantic” embeddings space, we showed that the key influential articles corresponding to high PageRanks did not systematically correspond to semantic hubs. Rather, human player's capabilities to navigate Wikispeedia not only depend on semantics, but also on an intuitive understanding of the underlying graph structure of Wikipedia forged through experience and a notion of centrality or generality of the pages.", visual: "none" },
                             { text: "3. How do navigation paths traverse these clusters: do players rely on hubs or remain within semantic neighbourhoods?\n Both actually! We showed that players first start by relying on these hubs to get structurally more central and progress towards articles that are likely to lead towards the target semantic neighbourhood. Once this structural exploration allowed them to reach central articles, players instinctively shift to a more semantic search and home in on the semantic neighbourhood of the target article.", visual: "none" },
                             { text: "4. Do human exploration patterns mirror the structure of knowledge or the logic of meaning? \n Once again, both structure of knowledge, aka an intuitive understanding of the article’s position in the hyperlink graph (measured as the betweenness centrality here) and the logic of meaning, aka the semantic relatedness of words or concepts (measured as Euclidean distance or cosine similarities in the embeddings space) play a role in human exploration patterns! Their relative importance changes as the game progresses but both are crucial to human strategies.", visual: "none" },
                             { text: "5. Does the way words relate allow for efficient strategies by itself? \n The ways words relate, in a semantic sense, do make for reliable strategies. Indeed, both strategies based on cosine similarity and Euclidean distance outperform human’s success rates. However, efficiency is another issue as human paths are consistently shorter than the ones obtained solely by semantic relationships. By introducing a notion of structure, we managed to decrease this average path length, but it still is greater than for the human paths, hinting at a more complex balancing of structure and semantics in the human decision process or additional decision features that were not taken into account in these strategies.", visual: "none"}
@@ -387,15 +387,15 @@
         // USAGE: You must create an 'assets' folder in your repo and upload images with these names.
         const createImg = (filename, alt) => `
             <div class="mt-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-                <img src="./assets/${filename}" alt="${alt}" class="w-full h-auto rounded bg-slate-100 min-h-[150px] object-contain" 
-                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-32 bg-slate-100 text-slate-400 text-xs text-center p-4\\'>Image not found:<br>assets/${filename}<br>(Upload this file to GitHub)</div>';"/>
+                <img src="./plots/${filename}" alt="${alt}" class="w-full h-auto rounded bg-slate-100 min-h-[150px] object-contain" 
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-32 bg-slate-100 text-slate-400 text-xs text-center p-4\\'>Image not found:<br>plots/${filename}<br>(Upload this file to GitHub)</div>';"/>
             </div>`;
 
         // Updated mappings based on the 'visual' fields in the conversationTopics data
         const imageMap = {
-            'plot-categories': 'categories_plot.png',
+            'plot-categories': 'articles_per_categories.png',
             'table-links': 'links_table.png',
-            'plot-path-stats': 'path_stats_plot.png', // New: for path success rate/stats
+            'plot-path-stats': 'finished_vs_unfinished.png', // New: for path success rate/stats
             'embeddings-tSNE': 'embeddings_tSNE.png',
             'human-euclidean-distance': 'human_euclidean_distance.png',
             'machine-example-euclidean-distance': 'machine_example_euclidean_distance.png',
