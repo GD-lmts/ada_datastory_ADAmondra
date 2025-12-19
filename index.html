@@ -466,17 +466,17 @@
             if (sender === 'human') wrapper.id = `msg-${stepMsgId}`; 
             
             const isHuman = sender === 'human';
-            // Check if there is a visual to display
             const hasVisual = visual !== 'none' && !isHuman; 
             
             wrapper.innerHTML = `
-                <div class="flex ${hasVisual ? 'w-full' : ''} max-w-[90%] md:max-w-[75%] ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
+                <div class="flex ${hasVisual ? 'w-full' : ''} max-w-[90%] md:max-w-[80%] ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
-                    <div class="${hasVisual ? 'w-full' : ''} py-2 px-4 rounded-2xl shadow-sm text-sm leading-relaxed ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 rounded-tl-none'}">
-                        <p class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
-                        ${hasVisual ? getVisualHTML(visual) : ''}
+                    <div class="flex flex-col ${hasVisual ? 'w-full' : ''} rounded-2xl shadow-sm text-sm leading-relaxed overflow-hidden ${isHuman ? 'bg-indigo-600 text-white rounded-tr-none py-2 px-4' : 'bg-white border border-slate-200 rounded-tl-none'}">
+                        ${!isHuman && text ? `<div class="pt-3 px-4 pb-1"><p class="ai-text-target"></p></div>` : ''}
+                        ${isHuman ? `<p>${text}</p>` : ''}
+                        ${hasVisual ? `<div class="w-full h-full">${getVisualHTML(visual)}</div>` : ''}
                     </div>
                 </div>
             `;
