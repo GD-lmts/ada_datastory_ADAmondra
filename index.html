@@ -12,10 +12,12 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         
+        /* Custom Scrollbar for Chat */
         .chat-scroll::-webkit-scrollbar { width: 6px; }
         .chat-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
         .chat-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
 
+        /* Typing cursor animation for AI messages */
         .ai-typing-message::after { content: '|'; animation: blink 1s step-start infinite; }
         
         .typing-cursor { position: relative; }
@@ -35,17 +37,27 @@
         #sidebar { transform: translateX(-100%); transition: transform 0.7s ease-out; }
         #sidebar.is-active { transform: translateX(0); }
 
-        /* Fix: Responsive Visual Containers */
+        /* FIX: Responsive Visual Containers to prevent cropping */
         .visual-container {
             width: 100%;
             height: auto;
             display: flex;
             flex-direction: column;
+            margin-top: 0.75rem;
         }
+
         .visual-container img {
             max-width: 100%;
             height: auto;
             display: block;
+            border-radius: 0.5rem;
+        }
+
+        .responsive-iframe {
+            width: 100%;
+            min-height: 450px;
+            height: auto;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -348,16 +360,15 @@
             });
         }
 
-        // Updated for Automatic Height Adjustment
+        // FIX: Remove fixed height and use responsive classes
         function getVisualHTML(type) {
             const createInteractivePlot = (filename) => `
-                <div class="mt-3 bg-white p-1 rounded-lg border border-slate-200 shadow-sm visual-container overflow-hidden">
+                <div class="visual-container shadow-sm border border-slate-200 bg-white p-1 rounded-lg">
                     <iframe 
                         src="./plots/${filename}" 
-                        class="w-full min-h-[400px] md:min-h-[500px]" 
+                        class="responsive-iframe bg-slate-50" 
                         frameborder="0" 
-                        scrolling="no"
-                        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px';">
+                        scrolling="no">
                     </iframe>
                 </div>`;
 
@@ -393,8 +404,8 @@
                     return createInteractivePlot(config.file);
                 } else {
                     return `
-                        <div class="mt-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm visual-container">
-                            <img src="./plots/${config.file}" alt="${type}" class="rounded">
+                        <div class="visual-container shadow-sm border border-slate-200 bg-white p-2 rounded-lg">
+                            <img src="./plots/${config.file}" alt="${type}">
                         </div>`;
                 }
             }
@@ -422,6 +433,7 @@
             }
         };
 
+        // FIX: Use full width for bubbles containing visuals to prevent cropping
         function addMessage(sender, text, visual, stepMsgId) {
             const wrapper = document.createElement('div');
             const isHuman = sender === 'human';
@@ -430,16 +442,16 @@
             wrapper.className = `flex w-full ${isHuman ? 'justify-end' : 'justify-start'} fade-in-up`;
             if (isHuman) wrapper.id = `msg-${stepMsgId}`; 
             
-            const bubbleClasses = hasVisual 
-                ? "w-full bg-white border border-slate-200 rounded-2xl rounded-tl-none shadow-sm" 
-                : (isHuman ? "bg-indigo-600 text-white rounded-tr-none" : "bg-white border border-slate-200 rounded-tl-none");
+            // Allow the bubble to take up the full available width if a visual is present
+            const bubbleWidthClass = hasVisual ? "w-full" : "max-w-[90%] md:max-w-[75%]";
+            const bubbleBgClass = isHuman ? "bg-indigo-600 text-white rounded-tr-none" : "bg-white border border-slate-200 rounded-tl-none";
 
             wrapper.innerHTML = `
-                <div class="flex ${hasVisual ? 'w-full' : 'max-w-[90%] md:max-w-[75%]'} ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
+                <div class="flex ${bubbleWidthClass} ${isHuman ? 'flex-row-reverse' : 'flex-row'}">
                     <div class="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mt-1 mx-2 ${isHuman ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-600 text-white'}">
                         <i class="fa-solid ${isHuman ? 'fa-user' : 'fa-robot text-sm'}"></i>
                     </div>
-                    <div class="py-2 px-4 rounded-2xl shadow-sm text-sm leading-relaxed ${bubbleClasses}">
+                    <div class="py-2 px-4 rounded-2xl shadow-sm text-sm leading-relaxed flex-1 ${bubbleBgClass}">
                         <p class="${sender === 'ai' ? 'ai-text-target' : ''}">${isHuman ? text : ''}</p>
                         ${hasVisual ? getVisualHTML(visual) : ''}
                     </div>
